@@ -9,6 +9,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 OUT_FILE = ROOT / "dashboard.html"
+OVERRIDES_FILE = ROOT / "repo_metrics_overrides.json"
 DATE_FILE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}\.md$")
 ITEM_RE = re.compile(
     r"^\* \[(?P<title>.+?)\]\((?P<url>https://github\.com/[^)]+)\):(?P<description>.*?)(?:\s*<!-- (?P<meta>.*?) -->)?$"
@@ -27,6 +28,12 @@ def parse_meta(raw_meta):
     return values
 
 
+def load_metric_overrides():
+    if not OVERRIDES_FILE.exists():
+        return {}
+    return json.loads(OVERRIDES_FILE.read_text(encoding="utf-8"))
+
+
 def iter_markdown_files():
     for path in ROOT.rglob("*.md"):
         if ".git" in path.parts or path.name == "README.md":
@@ -35,7 +42,8 @@ def iter_markdown_files():
             yield path
 
 
-def parse_file(path):
+def parse_file(path, metric_overrides=None):
+    metric_overrides = metric_overrides or {}
     date = path.stem
     current_language = None
     rank = 0
@@ -57,6 +65,13 @@ def parse_file(path):
         url = match.group("url").strip()
         owner_repo = url.replace("https://github.com/", "").strip("/")
         meta = parse_meta(match.group("meta"))
+        override = metric_overrides.get(owner_repo, {})
+        metrics_source = "snapshot" if meta["stars"] is not None else None
+        if meta["stars"] is None and "stars" in override:
+            meta["stars"] = override["stars"]
+            metrics_source = override.get("source", "override")
+        if meta["forks"] is None and "forks" in override:
+            meta["forks"] = override["forks"]
         entries.append(
             {
                 "date": date,
@@ -69,6 +84,7 @@ def parse_file(path):
                 "stars": meta["stars"],
                 "forks": meta["forks"],
                 "starsToday": meta["starsToday"],
+                "metricsSource": metrics_source,
             }
         )
 
@@ -77,8 +93,9 @@ def parse_file(path):
 
 def collect_data(days=DEFAULT_DAYS):
     entries = []
+    metric_overrides = load_metric_overrides()
     for path in iter_markdown_files():
-        entries.extend(parse_file(path))
+        entries.extend(parse_file(path, metric_overrides))
 
     entries.sort(key=lambda item: (item["date"], item["language"], item["rank"]))
     all_dates = sorted({item["date"] for item in entries})
@@ -818,7 +835,7 @@ def render_html(payload):
           <div class="repo-top">
             <span class="rank">#${{index + 1}}</span>
             <div>
-              <h3><a href="${{row.url}}" target="_blank" rel="noreferrer">${{escapeHtml(row.title)}}</a>${{row.latestStars >= 50000 ? '<span class="badge">高星口碑</span>' : ''}}${{row.growth >= 500 ? '<span class="badge rising">飙升项目</span>' : ''}}${{domainBadges(row.domains)}}<span class="badge score" title="推荐分由 Stars、增长、上榜次数和排名加权得到">推荐分 ${{row.score.toFixed(1)}}</span></h3>
+              <h3><a href="${{row.url}}" target="_blank" rel="noreferrer">${{escapeHtml(row.title)}}</a>${{row.latestStars >= 50000 ? '<span class="badge">高星口碑</span>' : ''}}${{row.growth >= 500 ? '<span class="badge rising">飙升项目</span>' : ''}}${{row.hasCurrentMetrics ? '<span class="badge score">当前指标</span>' : ''}}${{domainBadges(row.domains)}}<span class="badge score" title="推荐分由 Stars、增长、上榜次数和排名加权得到">推荐分 ${{row.score.toFixed(1)}}</span></h3>
               <p class="desc">${{escapeHtml(row.description || '暂无描述')}}</p>
               <div class="metric-row">${{rowMetrics(row)}}</div>
             </div>
@@ -847,9 +864,10 @@ def render_html(payload):
         const firstStar = starRows[0];
         const latestStar = starRows[starRows.length - 1];
         const avgRank = rows.reduce((sum, item) => sum + item.rank, 0) / rows.length;
-        const sameDayGrowth = latest.starsToday || 0;
-        const periodGrowth = firstStar && latestStar && firstStar !== latestStar ? latestStar.stars - firstStar.stars : sameDayGrowth;
-        return {{
+      const sameDayGrowth = latest.starsToday || 0;
+      const periodGrowth = firstStar && latestStar && firstStar !== latestStar ? latestStar.stars - firstStar.stars : sameDayGrowth;
+      const hasCurrentMetrics = starRows.some(row => row.metricsSource && row.metricsSource !== 'snapshot');
+      return {{
           repo,
           title: latest.title,
           url: latest.url,
@@ -862,6 +880,7 @@ def render_html(payload):
           latestForks: latestStar ? latestStar.forks : null,
           starsToday: sameDayGrowth,
           growth: Number.isFinite(periodGrowth) ? Math.max(0, periodGrowth) : null,
+          hasCurrentMetrics,
           languages: Array.from(new Set(rows.map(row => row.language))).join(', '),
           domains: Array.from(new Set(rows.flatMap(row => entryDomains(row)))),
           dates: rows.map(row => row.date),
@@ -895,7 +914,7 @@ def render_html(payload):
       els.leaderboard.innerHTML = rows.map(row => `
         <tr>
           <td>
-            <a href="${{row.url}}" target="_blank" rel="noreferrer">${{escapeHtml(row.title)}}</a>${{row.latestStars >= 50000 ? '<span class="badge">高星口碑</span>' : ''}}${{row.growth >= 500 ? '<span class="badge rising">飙升项目</span>' : ''}}${{domainBadges(row.domains)}}
+            <a href="${{row.url}}" target="_blank" rel="noreferrer">${{escapeHtml(row.title)}}</a>${{row.latestStars >= 50000 ? '<span class="badge">高星口碑</span>' : ''}}${{row.growth >= 500 ? '<span class="badge rising">飙升项目</span>' : ''}}${{row.hasCurrentMetrics ? '<span class="badge score">当前指标</span>' : ''}}${{domainBadges(row.domains)}}
             <div class="hint">${{escapeHtml(row.languages)}}</div>
           </td>
           <td>${{row.score.toFixed(1)}}</td>
