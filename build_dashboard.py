@@ -10,8 +10,21 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 OUT_FILE = ROOT / "dashboard.html"
 DATE_FILE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}\.md$")
-ITEM_RE = re.compile(r"^\* \[(?P<title>.+?)\]\((?P<url>https://github\.com/[^)]+)\):(?P<description>.*)$")
+ITEM_RE = re.compile(
+    r"^\* \[(?P<title>.+?)\]\((?P<url>https://github\.com/[^)]+)\):(?P<description>.*?)(?:\s*<!-- (?P<meta>.*?) -->)?$"
+)
+META_RE = re.compile(r"(stars|forks|stars_today):(\d+)")
 DEFAULT_DAYS = 370
+
+
+def parse_meta(raw_meta):
+    values = {"stars": None, "forks": None, "starsToday": None}
+    if not raw_meta:
+        return values
+    key_map = {"stars": "stars", "forks": "forks", "stars_today": "starsToday"}
+    for key, value in META_RE.findall(raw_meta):
+        values[key_map[key]] = int(value)
+    return values
 
 
 def iter_markdown_files():
@@ -43,6 +56,7 @@ def parse_file(path):
         title = match.group("title").strip()
         url = match.group("url").strip()
         owner_repo = url.replace("https://github.com/", "").strip("/")
+        meta = parse_meta(match.group("meta"))
         entries.append(
             {
                 "date": date,
@@ -52,6 +66,9 @@ def parse_file(path):
                 "repo": owner_repo,
                 "url": url,
                 "description": match.group("description").strip(),
+                "stars": meta["stars"],
+                "forks": meta["forks"],
+                "starsToday": meta["starsToday"],
             }
         )
 
@@ -209,7 +226,7 @@ def render_html(payload):
     }}
     .stats {{
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(6, minmax(0, 1fr));
       gap: 14px;
       margin-bottom: 18px;
     }}
@@ -221,7 +238,7 @@ def render_html(payload):
     }}
     .stat {{ padding: 16px; }}
     .stat .label {{ color: var(--muted); font-size: 13px; }}
-    .stat .value {{ margin-top: 5px; font-size: 28px; font-weight: 800; letter-spacing: 0; }}
+    .stat .value {{ margin-top: 5px; font-size: 24px; font-weight: 800; letter-spacing: 0; overflow-wrap: anywhere; }}
     .grid {{
       display: grid;
       grid-template-columns: minmax(0, 1.15fr) minmax(360px, .85fr);
@@ -281,6 +298,41 @@ def render_html(payload):
       color: var(--muted);
       font-size: 12px;
     }}
+    .metric-row {{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+      color: #344054;
+      font-size: 13px;
+    }}
+    .metric {{
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      min-height: 28px;
+      border-radius: 8px;
+      background: #eef7f4;
+      color: #095c51;
+      padding: 4px 9px;
+      font-weight: 700;
+    }}
+    .metric.hot {{ background: #fff4e5; color: #9a4b00; }}
+    .metric.rising {{ background: #f4efff; color: #6941c6; }}
+    .badge {{
+      display: inline-flex;
+      min-height: 22px;
+      align-items: center;
+      border-radius: 8px;
+      padding: 2px 7px;
+      margin-left: 6px;
+      color: #fff;
+      background: var(--accent);
+      font-size: 11px;
+      font-weight: 800;
+      vertical-align: middle;
+    }}
+    .badge.rising {{ background: var(--accent-3); }}
     .pill {{
       display: inline-flex;
       align-items: center;
@@ -348,13 +400,14 @@ def render_html(payload):
       .hero-inner, .grid {{ grid-template-columns: 1fr; }}
       .hero-actions {{ justify-content: flex-start; }}
       .toolbar-inner {{ grid-template-columns: 1fr 1fr; }}
-      .stats {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }}
+      .stats {{ grid-template-columns: repeat(3, minmax(0, 1fr)); }}
     }}
     @media (max-width: 680px) {{
       .hero {{ padding: 24px 16px 18px; }}
       .toolbar-inner, main {{ width: calc(100% - 20px); }}
       .toolbar-inner, .stats {{ grid-template-columns: 1fr; }}
-      .leaderboard th:nth-child(4), .leaderboard td:nth-child(4) {{ display: none; }}
+      .leaderboard th:nth-child(4), .leaderboard td:nth-child(4),
+      .leaderboard th:nth-child(6), .leaderboard td:nth-child(6) {{ display: none; }}
       .repo-top {{ grid-template-columns: auto minmax(0, 1fr); }}
       .share-mini {{ display: none; }}
     }}
@@ -414,6 +467,8 @@ def render_html(payload):
                 <tr>
                   <th>仓库</th>
                   <th>出现</th>
+                  <th>Stars</th>
+                  <th>+Stars</th>
                   <th>均排</th>
                   <th>趋势</th>
                 </tr>
@@ -516,15 +571,22 @@ def render_html(payload):
       const daily = entries.filter(entry => entry.date === state.date);
       const languages = new Set(entries.map(entry => entry.language));
       const repos = new Set(entries.map(entry => entry.repo));
-      const repeated = summarize(entries).filter(row => row.count > 1).length;
+      const rows = summarize(entries);
+      const repeated = rows.filter(row => row.count > 1).length;
+      const starEntries = entries.filter(entry => Number.isFinite(entry.stars));
+      const totalStarsToday = entries.reduce((sum, entry) => sum + (entry.starsToday || 0), 0);
+      const hottest = rows.filter(row => Number.isFinite(row.latestStars)).sort((a, b) => b.latestStars - a.latestStars)[0];
+      const fastest = rows.filter(row => Number.isFinite(row.growth)).sort((a, b) => b.growth - a.growth)[0];
       renderStats([
         ['数据日期', state.range === 'day' ? state.date : `${{dates[0]}} 至 ${{dates[dates.length - 1]}}`],
         ['仓库数量', repos.size.toLocaleString()],
-        ['语言数量', languages.size.toLocaleString()],
-        ['重复上榜', repeated.toLocaleString()]
+        ['有 Star 数据', starEntries.length.toLocaleString()],
+        ['今日新增 Stars', formatNumber(totalStarsToday)],
+        ['最高 Stars', hottest ? formatNumber(hottest.latestStars) : '暂无'],
+        ['最快增长', fastest ? `+${{formatNumber(fastest.growth)}}` : '暂无']
       ]);
       renderPrimary(state.range === 'day' ? daily : entries);
-      renderLeaderboard(entries);
+      renderLeaderboard(entries, rows);
       const mdPath = state.date.startsWith('2025') || state.date.startsWith('2026') ? `${{state.date}}.md` : `${{state.date.slice(0, 4)}}/${{state.date}}.md`;
       els.openLatestMd.href = mdPath;
       els.footerNote.textContent = `数据生成时间：${{new Date(DATA.generatedAt).toLocaleString()}}。当前 HTML 内嵌最近 ${{DATA.includedDays}} 天 / 总计 ${{DATA.totalDays}} 天中的 ${{DATA.entries.length.toLocaleString()}} 条排名记录，可以作为单个 HTML 文件分享。`;
@@ -555,6 +617,7 @@ def render_html(payload):
             <div>
               <h3><a href="${{entry.url}}" target="_blank" rel="noreferrer">${{escapeHtml(entry.title)}}</a></h3>
               <p class="desc">${{escapeHtml(entry.description || '暂无描述')}}</p>
+              <div class="metric-row">${{entryMetrics(entry)}}</div>
             </div>
             <button class="share-mini" title="复制该仓库链接" data-url="${{entry.url}}">↗</button>
           </div>
@@ -576,7 +639,12 @@ def render_html(payload):
       return Array.from(groups.entries()).map(([repo, rows]) => {{
         rows.sort((a, b) => a.date.localeCompare(b.date));
         const latest = rows[rows.length - 1];
+        const starRows = rows.filter(row => Number.isFinite(row.stars));
+        const firstStar = starRows[0];
+        const latestStar = starRows[starRows.length - 1];
         const avgRank = rows.reduce((sum, item) => sum + item.rank, 0) / rows.length;
+        const sameDayGrowth = latest.starsToday || 0;
+        const periodGrowth = firstStar && latestStar && firstStar !== latestStar ? latestStar.stars - firstStar.stars : sameDayGrowth;
         return {{
           repo,
           title: latest.title,
@@ -585,6 +653,10 @@ def render_html(payload):
           count: rows.length,
           avgRank,
           latestRank: latest.rank,
+          latestStars: latestStar ? latestStar.stars : null,
+          latestForks: latestStar ? latestStar.forks : null,
+          starsToday: sameDayGrowth,
+          growth: Number.isFinite(periodGrowth) ? Math.max(0, periodGrowth) : null,
           languages: Array.from(new Set(rows.map(row => row.language))).join(', '),
           dates: rows.map(row => row.date),
           ranks: rows.map(row => row.rank)
@@ -592,23 +664,49 @@ def render_html(payload):
       }}).sort((a, b) => b.count - a.count || a.avgRank - b.avgRank || a.latestRank - b.latestRank);
     }}
 
-    function renderLeaderboard(entries) {{
-      const rows = summarize(entries).slice(0, 40);
+    function renderLeaderboard(entries, summarizedRows) {{
+      const rows = (summarizedRows || summarize(entries)).slice().sort((a, b) => {{
+        const growthDiff = (b.growth || 0) - (a.growth || 0);
+        const starDiff = (b.latestStars || 0) - (a.latestStars || 0);
+        return b.count - a.count || growthDiff || starDiff || a.avgRank - b.avgRank || a.latestRank - b.latestRank;
+      }}).slice(0, 40);
       if (!rows.length) {{
-        els.leaderboard.innerHTML = '<tr><td class="empty" colspan="4">没有匹配的仓库</td></tr>';
+        els.leaderboard.innerHTML = '<tr><td class="empty" colspan="6">没有匹配的仓库</td></tr>';
         return;
       }}
       els.leaderboard.innerHTML = rows.map(row => `
         <tr>
           <td>
-            <a href="${{row.url}}" target="_blank" rel="noreferrer">${{escapeHtml(row.title)}}</a>
+            <a href="${{row.url}}" target="_blank" rel="noreferrer">${{escapeHtml(row.title)}}</a>${{row.latestStars >= 50000 ? '<span class="badge">热门</span>' : ''}}${{row.growth >= 500 ? '<span class="badge rising">明星</span>' : ''}}
             <div class="hint">${{escapeHtml(row.languages)}}</div>
           </td>
           <td>${{row.count}}</td>
+          <td>${{formatNumber(row.latestStars)}}</td>
+          <td>${{row.growth ? '+' + formatNumber(row.growth) : '暂无'}}</td>
           <td>${{row.avgRank.toFixed(1)}}</td>
           <td><div class="spark" title="${{escapeHtml(row.dates.join(', '))}}">${{sparkBars(row.ranks)}}</div></td>
         </tr>
       `).join('');
+    }}
+
+    function entryMetrics(entry) {{
+      if (!Number.isFinite(entry.stars)) {{
+        return '<span class="metric">暂无 star 快照</span>';
+      }}
+      const starsToday = entry.starsToday ? `+${{formatNumber(entry.starsToday)}} today` : 'today 暂无';
+      const forks = Number.isFinite(entry.forks) ? `Forks ${{formatNumber(entry.forks)}}` : 'Forks 暂无';
+      return `
+        <span class="metric hot">Stars ${{formatNumber(entry.stars)}}</span>
+        <span class="metric rising">${{starsToday}}</span>
+        <span class="metric">${{forks}}</span>
+      `;
+    }}
+
+    function formatNumber(value) {{
+      if (!Number.isFinite(value)) return '暂无';
+      if (value >= 1000000) return `${{(value / 1000000).toFixed(value >= 10000000 ? 0 : 1)}}M`;
+      if (value >= 1000) return `${{(value / 1000).toFixed(value >= 10000 ? 0 : 1)}}k`;
+      return String(value);
     }}
 
     function sparkBars(ranks) {{

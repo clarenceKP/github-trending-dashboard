@@ -5,7 +5,14 @@ import codecs
 import requests
 import os
 import time
+import re
 from pyquery import PyQuery as pq
+
+
+def parse_count(text):
+    text = (text or '').replace(',', '').strip()
+    match = re.search(r'\d+', text)
+    return int(match.group(0)) if match else 0
 
 
 def git_add_commit_push(date, filename):
@@ -50,9 +57,23 @@ def scrape(language, filename):
             description = i("p.col-9").text()
             url = i(".lh-condensed a").attr("href")
             url = "https://github.com" + url
+            meta = i('div.f6.color-fg-muted.mt-2')
+            links = meta('a.Link--muted')
+            stars = parse_count(pq(links.eq(0)).text())
+            forks = parse_count(pq(links.eq(1)).text())
+            stars_today = parse_count(meta('span.float-sm-right').text())
             # ownerImg = i("p.repo-list-meta a img").attr("src")
             # print(ownerImg)
-            f.write(u"* [{title}]({url}):{description}\n".format(title=title, url=url, description=description))
+            f.write(
+                u"* [{title}]({url}):{description} <!-- stars:{stars} forks:{forks} stars_today:{stars_today} -->\n".format(
+                    title=title,
+                    url=url,
+                    description=description,
+                    stars=stars,
+                    forks=forks,
+                    stars_today=stars_today,
+                )
+            )
 
 
 def job():
