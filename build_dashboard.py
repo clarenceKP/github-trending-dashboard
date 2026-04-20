@@ -559,7 +559,7 @@ def render_html(payload):
         </div>
         <div class="hero-actions">
           <button class="button" id="copyShare">复制分享链接</button>
-          <a class="button" id="openLatestMd" href="#" target="_blank" rel="noreferrer">打开当天 Markdown</a>
+          <a class="button" id="openLatestMd" href="#" target="_blank" rel="noreferrer">在 GitHub 打开 Markdown</a>
         </div>
       </div>
     </header>
@@ -883,7 +883,7 @@ def render_html(payload):
       renderPrimary(recommended);
       renderLeaderboard(entries, recommended);
       const mdPath = state.date.startsWith('2025') || state.date.startsWith('2026') ? `${{state.date}}.md` : `${{state.date.slice(0, 4)}}/${{state.date}}.md`;
-      els.openLatestMd.href = mdPath;
+      els.openLatestMd.href = `https://github.com/clarenceKP/github-trending-dashboard/blob/main/${{mdPath}}`;
       els.footerNote.textContent = `数据生成时间：${{new Date(DATA.generatedAt).toLocaleString()}}。当前 HTML 内嵌最近 ${{DATA.includedDays}} 天 / 总计 ${{DATA.totalDays}} 天中的 ${{DATA.entries.length.toLocaleString()}} 条排名记录，可以作为单个 HTML 文件分享。`;
     }}
 
