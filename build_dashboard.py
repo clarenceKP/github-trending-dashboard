@@ -477,9 +477,20 @@ def render_html(payload):
       height: 34px;
       cursor: pointer;
     }}
-    .leaderboard {{ width: 100%; border-collapse: collapse; }}
+    .leaderboard {{
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }}
+    .leaderboard col:nth-child(1) {{ width: 38%; }}
+    .leaderboard col:nth-child(2) {{ width: 86px; }}
+    .leaderboard col:nth-child(3) {{ width: 58px; }}
+    .leaderboard col:nth-child(4) {{ width: 78px; }}
+    .leaderboard col:nth-child(5) {{ width: 82px; }}
+    .leaderboard col:nth-child(6) {{ width: 64px; }}
+    .leaderboard col:nth-child(7) {{ width: 126px; }}
     .leaderboard th, .leaderboard td {{
-      padding: 12px 14px;
+      padding: 12px 12px;
       border-bottom: 1px solid var(--line);
       text-align: left;
       vertical-align: top;
@@ -495,6 +506,10 @@ def render_html(payload):
       z-index: 3;
       backdrop-filter: var(--glass);
       box-shadow: 0 1px 0 var(--line), 0 10px 20px rgba(32,48,74,.06);
+      white-space: nowrap;
+    }}
+    .leaderboard td {{
+      overflow-wrap: anywhere;
     }}
     .leaderboard a {{ text-decoration: none; font-weight: 750; overflow-wrap: anywhere; }}
     .leaderboard a:hover {{ text-decoration: underline; }}
@@ -616,11 +631,20 @@ def render_html(payload):
           </div>
           <div style="overflow:auto; max-height: 820px;">
             <table class="leaderboard">
+              <colgroup>
+                <col>
+                <col>
+                <col>
+                <col>
+                <col>
+                <col>
+                <col>
+              </colgroup>
               <thead>
                 <tr>
                   <th>仓库</th>
                   <th id="scoreHeader" title="热度分以历史累计 Stars 和今日热度为主权重">热度分</th>
-                  <th>出现</th>
+                  <th title="所选周期内进入 GitHub Trending 的次数；次数越多代表热度越持续">出现</th>
                   <th>Stars</th>
                   <th>+Stars</th>
                   <th>均排</th>
@@ -766,6 +790,10 @@ def render_html(payload):
       return mode === 'rising' ? '飙升榜' : '热门榜';
     }}
 
+    function aggregateRankModeLabel(mode = state.rankMode) {{
+      return mode === 'rising' ? '综合飙升榜' : '综合热门榜';
+    }}
+
     function scoreLabel(mode = state.rankMode) {{
       return mode === 'rising' ? '飙升分' : '热度分';
     }}
@@ -866,7 +894,7 @@ def render_html(payload):
       const fastest = rows.filter(row => Number.isFinite(row.growth)).sort((a, b) => b.growth - a.growth)[0];
       const recommended = rankRows(rows);
       renderBrief(recommended, dates);
-      els.leaderboardTitle.textContent = rankModeLabel();
+      els.leaderboardTitle.textContent = aggregateRankModeLabel();
       els.leaderboardHint.textContent = state.rankMode === 'rising'
         ? '以周期新增 Stars、今日新增和增长速度为主权重'
         : '以历史累计 Stars、今日热度和长期口碑为主权重';
