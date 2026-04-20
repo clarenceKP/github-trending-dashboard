@@ -207,6 +207,10 @@ def render_html(payload):
       padding: 8px 10px;
       outline: none;
     }}
+    .control:focus {{
+      border-color: rgba(8,117,104,.55);
+      box-shadow: 0 0 0 4px rgba(8,117,104,.10);
+    }}
     .segments {{
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -418,8 +422,10 @@ def render_html(payload):
       font-weight: 700;
       background: rgba(248,250,252,.92);
       position: sticky;
-      top: 69px;
-      z-index: 2;
+      top: 0;
+      z-index: 3;
+      backdrop-filter: var(--glass);
+      box-shadow: 0 1px 0 var(--line), 0 10px 20px rgba(32,48,74,.06);
     }}
     .leaderboard a {{ text-decoration: none; font-weight: 750; overflow-wrap: anywhere; }}
     .leaderboard a:hover {{ text-decoration: underline; }}
@@ -497,7 +503,7 @@ def render_html(payload):
           <button class="segment" data-range="week">近一周</button>
           <button class="segment" data-range="month">近一月</button>
         </div>
-        <input class="control" id="searchInput" type="search" placeholder="搜索仓库、作者或描述">
+        <input class="control" id="searchInput" type="search" placeholder="模糊搜索：repo、作者、关键词">
       </div>
     </section>
 
@@ -629,13 +635,11 @@ def render_html(payload):
 
     function filteredEntries() {{
       const dates = new Set(selectedDates());
-      const q = state.q.trim().toLowerCase();
       return DATA.entries.filter(entry => {{
         if (!dates.has(entry.date)) return false;
         if (state.language !== 'all' && entry.language !== state.language) return false;
         if (state.domain !== 'all' && !entryMatchesDomain(entry, state.domain)) return false;
-        if (!q) return true;
-        return [entry.title, entry.repo, entry.description, entry.language].some(value => (value || '').toLowerCase().includes(q));
+        return true;
       }});
     }}
 
@@ -672,21 +676,92 @@ def render_html(payload):
       return (domains || []).map(domain => `<span class="badge ${{domain}}">${{domainLabel(domain)}}</span>`).join('');
     }}
 
+    function normalizeSearch(value) {{
+      return String(value ?? '')
+        .toLowerCase()
+        .normalize('NFKD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9\u4e00-\u9fff]+/g, ' ')
+        .trim();
+    }}
+
+    function subsequenceScore(token, haystack) {{
+      let tokenIndex = 0;
+      let first = -1;
+      let previous = -1;
+      let gaps = 0;
+      for (let i = 0; i < haystack.length && tokenIndex < token.length; i += 1) {{
+        if (haystack[i] !== token[tokenIndex]) continue;
+        if (first === -1) first = i;
+        if (previous !== -1) gaps += i - previous - 1;
+        previous = i;
+        tokenIndex += 1;
+      }}
+      if (tokenIndex !== token.length) return -1;
+      return 45 + token.length * 6 - gaps * 0.7 - first * 0.15;
+    }}
+
+    function fuzzyScore(query, value) {{
+      const q = normalizeSearch(query);
+      const haystack = normalizeSearch(value);
+      if (!q) return 0;
+      if (!haystack) return -1;
+      const compactHaystack = haystack.replace(/\s+/g, '');
+      const tokens = q.split(/\s+/).filter(Boolean);
+      let total = 0;
+      for (const token of tokens) {{
+        const compactToken = token.replace(/\s+/g, '');
+        const exactIndex = haystack.indexOf(token);
+        if (exactIndex >= 0) {{
+          total += 120 + token.length * 4 - Math.min(exactIndex, 80) * 0.45;
+          continue;
+        }}
+        const compactIndex = compactHaystack.indexOf(compactToken);
+        if (compactIndex >= 0) {{
+          total += 92 + compactToken.length * 3 - Math.min(compactIndex, 80) * 0.35;
+          continue;
+        }}
+        const loose = subsequenceScore(compactToken, compactHaystack);
+        if (loose < 0) return -1;
+        total += loose;
+      }}
+      return total;
+    }}
+
+    function rowSearchText(row) {{
+      return [
+        row.title,
+        row.repo,
+        row.description,
+        row.languages,
+        ...(row.domains || []).map(domainLabel)
+      ].join(' ');
+    }}
+
+    function searchRows(rows) {{
+      const q = state.q.trim();
+      if (!q) return rows;
+      return rows
+        .map(row => ({{ ...row, searchScore: fuzzyScore(q, rowSearchText(row)) }}))
+        .filter(row => row.searchScore >= 0)
+        .sort((a, b) => b.searchScore - a.searchScore || b.score - a.score);
+    }}
+
     function render() {{
       updateHash();
       const entries = filteredEntries();
       const dates = selectedDates();
-      const daily = entries.filter(entry => entry.date === state.date);
-      const languages = new Set(entries.map(entry => entry.language));
-      const repos = new Set(entries.map(entry => entry.repo));
-      const rows = summarize(entries);
+      const allRows = summarize(entries);
+      const rows = searchRows(allRows);
+      const languages = new Set(rows.flatMap(row => row.languages.split(', ').filter(Boolean)));
+      const repos = new Set(rows.map(row => row.repo));
       const repeated = rows.filter(row => row.count > 1).length;
-      const starEntries = entries.filter(entry => Number.isFinite(entry.stars));
-      const totalStarsToday = entries.reduce((sum, entry) => sum + (entry.starsToday || 0), 0);
+      const starEntries = rows.filter(row => Number.isFinite(row.latestStars));
+      const totalStarsToday = rows.reduce((sum, row) => sum + (row.starsToday || 0), 0);
       const hottest = rows.filter(row => Number.isFinite(row.latestStars)).sort((a, b) => b.latestStars - a.latestStars)[0];
       const fastest = rows.filter(row => Number.isFinite(row.growth)).sort((a, b) => b.growth - a.growth)[0];
       const recommended = rankRows(rows);
-      renderBrief(recommended, dates, entries);
+      renderBrief(recommended, dates);
       renderStats([
         ['数据日期', state.range === 'day' ? state.date : `${{dates[0]}} 至 ${{dates[dates.length - 1]}}`],
         ['仓库数量', repos.size.toLocaleString()],
@@ -711,11 +786,11 @@ def render_html(payload):
       `).join('');
     }}
 
-    function renderBrief(rows, dates, entries) {{
+    function renderBrief(rows, dates) {{
       const top = rows[0];
       const hottest = rows.filter(row => Number.isFinite(row.latestStars)).sort((a, b) => b.latestStars - a.latestStars)[0];
       const fastest = rows.filter(row => Number.isFinite(row.growth)).sort((a, b) => b.growth - a.growth)[0];
-      const starEntries = entries.filter(entry => Number.isFinite(entry.stars));
+      const starEntries = rows.filter(row => Number.isFinite(row.latestStars));
       const periodLabel = state.range === 'day' ? state.date : `${{dates[0]}} 至 ${{dates[dates.length - 1]}}`;
       if (!rows.length) {{
         els.periodBrief.innerHTML = '<h2>周期导读</h2><p>当前筛选条件下没有可展示的项目。</p>';
@@ -732,7 +807,7 @@ def render_html(payload):
     function renderPrimary(rows) {{
       const title = state.range === 'day' ? '综合推荐榜' : (state.range === 'week' ? '近一周综合推荐' : '近一月综合推荐');
       els.primaryTitle.textContent = title;
-      els.primaryHint.textContent = `${{state.domain === 'all' ? (state.language === 'all' ? '跨语言整体视图' : state.language) : domainLabel(state.domain)}}，按 Stars、增长、上榜稳定性和排名综合排序`;
+      els.primaryHint.textContent = `${{state.domain === 'all' ? (state.language === 'all' ? '跨语言整体视图' : state.language) : domainLabel(state.domain)}}，按 Stars、增长、上榜稳定性和排名综合排序${{state.q.trim() ? '，已启用模糊搜索' : ''}}`;
       const sorted = rows.slice(0, 80);
       if (!sorted.length) {{
         els.repoList.innerHTML = '<div class="empty">没有匹配的排名记录</div>';
