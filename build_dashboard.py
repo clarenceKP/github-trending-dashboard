@@ -110,23 +110,27 @@ def render_html(payload):
   <style>
     :root {{
       color-scheme: light;
-      --ink: #111827;
+      --ink: #172033;
       --muted: #667085;
-      --line: #d7dee8;
-      --panel: #ffffff;
-      --soft: #f4f7fb;
-      --accent: #0f766e;
+      --line: rgba(132, 152, 179, .32);
+      --panel: rgba(255, 255, 255, .74);
+      --panel-strong: rgba(255, 255, 255, .88);
+      --soft: rgba(246, 248, 251, .86);
+      --accent: #087568;
       --accent-2: #b42318;
-      --accent-3: #7a5af8;
+      --accent-3: #6e56cf;
       --good: #067647;
-      --shadow: 0 18px 45px rgba(16, 24, 40, 0.10);
+      --shadow: 0 22px 60px rgba(32, 48, 74, 0.12);
+      --glass: saturate(180%) blur(24px);
     }}
     * {{ box-sizing: border-box; }}
     body {{
       margin: 0;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       color: var(--ink);
-      background: #eef3f8;
+      background:
+        linear-gradient(180deg, rgba(246, 249, 252, .98), rgba(231, 238, 247, .94)),
+        linear-gradient(120deg, rgba(219, 244, 239, .52), rgba(239, 243, 255, .68));
     }}
     button, input, select {{ font: inherit; }}
     a {{ color: inherit; }}
@@ -135,7 +139,7 @@ def render_html(payload):
       padding: 30px 28px 22px;
       color: #fff;
       background:
-        linear-gradient(120deg, rgba(8, 51, 68, .92), rgba(20, 83, 45, .76)),
+        linear-gradient(115deg, rgba(10, 37, 48, .92), rgba(12, 92, 78, .78)),
         url("https://images.unsplash.com/photo-1556075798-4825dfaaf498?auto=format&fit=crop&w=1800&q=80");
       background-size: cover;
       background-position: center;
@@ -150,7 +154,7 @@ def render_html(payload):
     }}
     h1 {{
       margin: 0 0 10px;
-      font-size: clamp(32px, 5vw, 66px);
+      font-size: 58px;
       line-height: .95;
       letter-spacing: 0;
     }}
@@ -166,7 +170,8 @@ def render_html(payload):
       border-radius: 8px;
       padding: 8px 13px;
       color: #fff;
-      background: rgba(255,255,255,.14);
+      background: rgba(255,255,255,.16);
+      backdrop-filter: var(--glass);
       cursor: pointer;
       text-decoration: none;
     }}
@@ -180,8 +185,8 @@ def render_html(payload):
       top: 0;
       z-index: 5;
       border-bottom: 1px solid var(--line);
-      background: rgba(244, 247, 251, .92);
-      backdrop-filter: blur(14px);
+      background: rgba(246, 248, 252, .76);
+      backdrop-filter: var(--glass);
     }}
     .toolbar-inner {{
       width: min(1440px, calc(100% - 32px));
@@ -197,7 +202,7 @@ def render_html(payload):
       min-height: 40px;
       border: 1px solid var(--line);
       border-radius: 8px;
-      background: #fff;
+      background: rgba(255,255,255,.76);
       color: var(--ink);
       padding: 8px 10px;
       outline: none;
@@ -209,7 +214,7 @@ def render_html(payload):
       padding: 4px;
       border: 1px solid var(--line);
       border-radius: 8px;
-      background: #fff;
+      background: rgba(255,255,255,.68);
     }}
     .segment {{
       border: 0;
@@ -235,6 +240,35 @@ def render_html(payload):
       border-radius: 8px;
       background: var(--panel);
       box-shadow: var(--shadow);
+      backdrop-filter: var(--glass);
+    }}
+    .domain-tabs {{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+      padding: 6px;
+      width: max-content;
+      max-width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255,255,255,.58);
+      backdrop-filter: var(--glass);
+      box-shadow: 0 16px 42px rgba(32,48,74,.08);
+    }}
+    .domain-tab {{
+      min-height: 34px;
+      border: 0;
+      border-radius: 7px;
+      padding: 6px 14px;
+      color: #475467;
+      background: transparent;
+      cursor: pointer;
+    }}
+    .domain-tab.active {{
+      color: #fff;
+      background: #172033;
+      box-shadow: 0 10px 24px rgba(23,32,51,.18);
     }}
     .stat {{ padding: 16px; }}
     .stat .label {{ color: var(--muted); font-size: 13px; }}
@@ -273,7 +307,7 @@ def render_html(payload):
     .panel h2 {{ margin: 0; font-size: 17px; letter-spacing: 0; }}
     .hint {{ color: var(--muted); font-size: 13px; }}
     .repo-list {{ display: grid; gap: 10px; padding: 14px; }}
-    .repo-card {{ box-shadow: none; padding: 14px; }}
+    .repo-card {{ box-shadow: none; padding: 14px; background: rgba(255,255,255,.74); }}
     .repo-top {{
       display: grid;
       grid-template-columns: auto minmax(0, 1fr) auto;
@@ -350,20 +384,22 @@ def render_html(payload):
     }}
     .badge.rising {{ background: var(--accent-3); }}
     .badge.score {{ background: var(--accent-2); }}
+    .badge.ai {{ background: #175cd3; }}
+    .badge.finance {{ background: #027a48; }}
     .pill {{
       display: inline-flex;
       align-items: center;
       min-height: 24px;
       border-radius: 8px;
       border: 1px solid #d8e0ea;
-      background: #f8fafc;
+      background: rgba(248,250,252,.82);
       padding: 3px 8px;
       white-space: nowrap;
     }}
     .share-mini {{
       border: 1px solid var(--line);
       border-radius: 8px;
-      background: #fff;
+      background: rgba(255,255,255,.76);
       min-width: 34px;
       height: 34px;
       cursor: pointer;
@@ -380,7 +416,7 @@ def render_html(payload):
       color: var(--muted);
       font-size: 12px;
       font-weight: 700;
-      background: #f8fafc;
+      background: rgba(248,250,252,.92);
       position: sticky;
       top: 69px;
       z-index: 2;
@@ -421,12 +457,19 @@ def render_html(payload):
     }}
     @media (max-width: 680px) {{
       .hero {{ padding: 24px 16px 18px; }}
+      h1 {{ font-size: 34px; line-height: 1; }}
       .toolbar-inner, main {{ width: calc(100% - 20px); }}
       .toolbar-inner, .stats {{ grid-template-columns: 1fr; }}
+      .domain-tabs {{ width: 100%; }}
+      .domain-tab {{ flex: 1; }}
       .leaderboard th:nth-child(4), .leaderboard td:nth-child(4),
-      .leaderboard th:nth-child(6), .leaderboard td:nth-child(6) {{ display: none; }}
+      .leaderboard th:nth-child(5), .leaderboard td:nth-child(5),
+      .leaderboard th:nth-child(7), .leaderboard td:nth-child(7) {{ display: none; }}
       .repo-top {{ grid-template-columns: auto minmax(0, 1fr); }}
       .share-mini {{ display: none; }}
+    }}
+    @media (min-width: 681px) and (max-width: 1000px) {{
+      h1 {{ font-size: 44px; }}
     }}
   </style>
 </head>
@@ -459,6 +502,11 @@ def render_html(payload):
     </section>
 
     <main>
+      <nav class="domain-tabs" id="domainTabs" aria-label="重点领域">
+        <button class="domain-tab active" data-domain="all">整体视图</button>
+        <button class="domain-tab" data-domain="ai">AI 项目</button>
+        <button class="domain-tab" data-domain="finance">金融项目</button>
+      </nav>
       <section class="panel brief" id="periodBrief"></section>
       <section class="stats" id="stats"></section>
       <section class="grid">
@@ -484,11 +532,12 @@ def render_html(payload):
               <thead>
                 <tr>
                   <th>仓库</th>
+                  <th title="推荐分由 Stars、增长、上榜次数和排名加权得到">推荐分</th>
                   <th>出现</th>
                   <th>Stars</th>
                   <th>+Stars</th>
                   <th>均排</th>
-                  <th>趋势</th>
+                  <th title="柱越高代表对应日期的语言排名越靠前">排名走势</th>
                 </tr>
               </thead>
               <tbody id="leaderboard"></tbody>
@@ -506,6 +555,7 @@ def render_html(payload):
     const state = {{
       date: DATA.latestDate,
       language: 'all',
+      domain: 'all',
       range: 'day',
       q: ''
     }};
@@ -514,6 +564,7 @@ def render_html(payload):
       dateSelect: document.getElementById('dateSelect'),
       languageSelect: document.getElementById('languageSelect'),
       searchInput: document.getElementById('searchInput'),
+      domainTabs: document.getElementById('domainTabs'),
       periodBrief: document.getElementById('periodBrief'),
       stats: document.getElementById('stats'),
       repoList: document.getElementById('repoList'),
@@ -542,10 +593,12 @@ def render_html(payload):
       const params = new URLSearchParams(location.hash.replace(/^#/, ''));
       const date = params.get('date');
       const language = params.get('language');
+      const domain = params.get('domain');
       const range = params.get('range');
       const q = params.get('q');
       if (date && DATA.dates.includes(date)) state.date = date;
       if (language && (language === 'all' || DATA.languages.includes(language))) state.language = language;
+      if (['all', 'ai', 'finance'].includes(domain)) state.domain = domain;
       if (['day', 'week', 'month'].includes(range)) state.range = range;
       if (q) state.q = q;
     }}
@@ -555,12 +608,14 @@ def render_html(payload):
       els.languageSelect.value = state.language;
       els.searchInput.value = state.q;
       document.querySelectorAll('.segment').forEach(button => button.classList.toggle('active', button.dataset.range === state.range));
+      document.querySelectorAll('.domain-tab').forEach(button => button.classList.toggle('active', button.dataset.domain === state.domain));
     }}
 
     function updateHash() {{
       const params = new URLSearchParams();
       params.set('date', state.date);
       params.set('language', state.language);
+      params.set('domain', state.domain);
       params.set('range', state.range);
       if (state.q) params.set('q', state.q);
       history.replaceState(null, '', '#' + params.toString());
@@ -578,9 +633,43 @@ def render_html(payload):
       return DATA.entries.filter(entry => {{
         if (!dates.has(entry.date)) return false;
         if (state.language !== 'all' && entry.language !== state.language) return false;
+        if (state.domain !== 'all' && !entryMatchesDomain(entry, state.domain)) return false;
         if (!q) return true;
         return [entry.title, entry.repo, entry.description, entry.language].some(value => (value || '').toLowerCase().includes(q));
       }});
+    }}
+
+    const DOMAIN_RULES = {{
+      ai: [
+        /(^|[^a-z])ai([^a-z]|$)/, /openai/, /llm/, /gpt/, /agent/, /rag/, /embedding/, /vector/,
+        /machine learning/, /deep learning/, /neural/, /transformer/, /diffusion/, /inference/,
+        /model/, /chatbot/, /computer vision/, /llama/, /ollama/, /langchain/, /langgraph/,
+        /人工智能/, /大模型/, /智能体/, /机器学习/, /深度学习/, /模型/
+      ],
+      finance: [
+        /finance/, /financial/, /fintech/, /market/, /investment/, /investing/, /trading/, /trader/,
+        /stock/, /equity/, /portfolio/, /quant/, /hedge/, /bank/, /payment/, /crypto/, /bitcoin/,
+        /blockchain/, /economics/, /terminal/, /财富/, /金融/, /投资/, /股票/, /市场/, /交易/, /量化/, /基金/, /银行/
+      ]
+    }};
+
+    function entryDomains(entry) {{
+      const text = `${{entry.title || ''}} ${{entry.repo || ''}} ${{entry.description || ''}}`.toLowerCase();
+      return Object.entries(DOMAIN_RULES)
+        .filter(([, rules]) => rules.some(rule => rule.test(text)))
+        .map(([domain]) => domain);
+    }}
+
+    function entryMatchesDomain(entry, domain) {{
+      return entryDomains(entry).includes(domain);
+    }}
+
+    function domainLabel(domain) {{
+      return domain === 'ai' ? 'AI' : domain === 'finance' ? '金融' : '整体';
+    }}
+
+    function domainBadges(domains) {{
+      return (domains || []).map(domain => `<span class="badge ${{domain}}">${{domainLabel(domain)}}</span>`).join('');
     }}
 
     function render() {{
@@ -633,16 +722,17 @@ def render_html(payload):
         return;
       }}
       const coverage = starEntries.length ? `其中 ${{starEntries.length}} 条记录带有 star 快照，排序会优先参考项目体量和增长速度。` : '当前周期大多是历史旧记录，缺少 star 快照，排序会回退参考上榜频次和排名。';
-      const topText = `<strong>${{escapeHtml(top.title)}}</strong> 是综合推荐榜首，综合分 ${{top.score.toFixed(1)}}，最新 Stars ${{formatNumber(top.latestStars)}}，周期新增 ${{top.growth ? '+' + formatNumber(top.growth) : '暂无'}}。`;
+      const topText = `<strong>${{escapeHtml(top.title)}}</strong> 是综合推荐榜首，推荐分 ${{top.score.toFixed(1)}}，最新 Stars ${{formatNumber(top.latestStars)}}，周期新增 ${{top.growth ? '+' + formatNumber(top.growth) : '暂无'}}。`;
       const hotText = hottest ? `最热门项目是 <strong>${{escapeHtml(hottest.title)}}</strong>，总 Stars ${{formatNumber(hottest.latestStars)}}。` : '';
-      const fastText = fastest ? `增长最快的是 <strong>${{escapeHtml(fastest.title)}}</strong>，本周期新增 ${{fastest.growth ? '+' + formatNumber(fastest.growth) : '暂无'}}。` : '';
-      els.periodBrief.innerHTML = `<h2>周期导读</h2><p>${{periodLabel}}，${{state.language === 'all' ? '跨语言' : escapeHtml(state.language)}}共观察到 ${{rows.length}} 个独立项目。${{coverage}} ${{topText}} ${{hotText}} ${{fastText}}</p>`;
+      const fastText = fastest ? `飙升最快的是 <strong>${{escapeHtml(fastest.title)}}</strong>，本周期新增 ${{fastest.growth ? '+' + formatNumber(fastest.growth) : '暂无'}}。` : '';
+      const scopeLabel = state.domain === 'all' ? (state.language === 'all' ? '跨语言' : escapeHtml(state.language)) : domainLabel(state.domain);
+      els.periodBrief.innerHTML = `<h2>周期导读</h2><p>${{periodLabel}}，${{scopeLabel}}共观察到 ${{rows.length}} 个独立项目。${{coverage}} ${{topText}} ${{hotText}} ${{fastText}}</p>`;
     }}
 
     function renderPrimary(rows) {{
       const title = state.range === 'day' ? '综合推荐榜' : (state.range === 'week' ? '近一周综合推荐' : '近一月综合推荐');
       els.primaryTitle.textContent = title;
-      els.primaryHint.textContent = `${{state.language === 'all' ? '跨语言整体视图' : state.language}}，按 Stars、增长、上榜稳定性和排名综合排序`;
+      els.primaryHint.textContent = `${{state.domain === 'all' ? (state.language === 'all' ? '跨语言整体视图' : state.language) : domainLabel(state.domain)}}，按 Stars、增长、上榜稳定性和排名综合排序`;
       const sorted = rows.slice(0, 80);
       if (!sorted.length) {{
         els.repoList.innerHTML = '<div class="empty">没有匹配的排名记录</div>';
@@ -653,7 +743,7 @@ def render_html(payload):
           <div class="repo-top">
             <span class="rank">#${{index + 1}}</span>
             <div>
-              <h3><a href="${{row.url}}" target="_blank" rel="noreferrer">${{escapeHtml(row.title)}}</a>${{row.latestStars >= 50000 ? '<span class="badge">热门</span>' : ''}}${{row.growth >= 500 ? '<span class="badge rising">明星</span>' : ''}}<span class="badge score">Score ${{row.score.toFixed(1)}}</span></h3>
+              <h3><a href="${{row.url}}" target="_blank" rel="noreferrer">${{escapeHtml(row.title)}}</a>${{row.latestStars >= 50000 ? '<span class="badge">高星口碑</span>' : ''}}${{row.growth >= 500 ? '<span class="badge rising">飙升项目</span>' : ''}}${{domainBadges(row.domains)}}<span class="badge score" title="推荐分由 Stars、增长、上榜次数和排名加权得到">推荐分 ${{row.score.toFixed(1)}}</span></h3>
               <p class="desc">${{escapeHtml(row.description || '暂无描述')}}</p>
               <div class="metric-row">${{rowMetrics(row)}}</div>
             </div>
@@ -698,6 +788,7 @@ def render_html(payload):
           starsToday: sameDayGrowth,
           growth: Number.isFinite(periodGrowth) ? Math.max(0, periodGrowth) : null,
           languages: Array.from(new Set(rows.map(row => row.language))).join(', '),
+          domains: Array.from(new Set(rows.flatMap(row => entryDomains(row)))),
           dates: rows.map(row => row.date),
           ranks: rows.map(row => row.rank)
         }};
@@ -723,15 +814,16 @@ def render_html(payload):
     function renderLeaderboard(entries, summarizedRows) {{
       const rows = rankRows(summarizedRows || summarize(entries)).slice(0, 40);
       if (!rows.length) {{
-        els.leaderboard.innerHTML = '<tr><td class="empty" colspan="6">没有匹配的仓库</td></tr>';
+        els.leaderboard.innerHTML = '<tr><td class="empty" colspan="7">没有匹配的仓库</td></tr>';
         return;
       }}
       els.leaderboard.innerHTML = rows.map(row => `
         <tr>
           <td>
-            <a href="${{row.url}}" target="_blank" rel="noreferrer">${{escapeHtml(row.title)}}</a>${{row.latestStars >= 50000 ? '<span class="badge">热门</span>' : ''}}${{row.growth >= 500 ? '<span class="badge rising">明星</span>' : ''}}
+            <a href="${{row.url}}" target="_blank" rel="noreferrer">${{escapeHtml(row.title)}}</a>${{row.latestStars >= 50000 ? '<span class="badge">高星口碑</span>' : ''}}${{row.growth >= 500 ? '<span class="badge rising">飙升项目</span>' : ''}}${{domainBadges(row.domains)}}
             <div class="hint">${{escapeHtml(row.languages)}}</div>
           </td>
+          <td>${{row.score.toFixed(1)}}</td>
           <td>${{row.count}}</td>
           <td>${{formatNumber(row.latestStars)}}</td>
           <td>${{row.growth ? '+' + formatNumber(row.growth) : '暂无'}}</td>
@@ -745,7 +837,7 @@ def render_html(payload):
       if (!Number.isFinite(entry.stars)) {{
         return '<span class="metric">暂无 star 快照</span>';
       }}
-      const starsToday = entry.starsToday ? `+${{formatNumber(entry.starsToday)}} today` : 'today 暂无';
+      const starsToday = entry.starsToday ? `+${{formatNumber(entry.starsToday)}} 今日` : '今日暂无';
       const forks = Number.isFinite(entry.forks) ? `Forks ${{formatNumber(entry.forks)}}` : 'Forks 暂无';
       return `
         <span class="metric hot">Stars ${{formatNumber(entry.stars)}}</span>
@@ -758,8 +850,8 @@ def render_html(payload):
       if (!Number.isFinite(row.latestStars)) {{
         return '<span class="metric">暂无 star 快照</span>';
       }}
-      const growth = row.growth ? `+${{formatNumber(row.growth)}} period` : 'period 暂无';
-      const today = row.starsToday ? `+${{formatNumber(row.starsToday)}} today` : 'today 暂无';
+      const growth = row.growth ? `+${{formatNumber(row.growth)}} 周期` : '周期暂无';
+      const today = row.starsToday ? `+${{formatNumber(row.starsToday)}} 今日` : '今日暂无';
       const forks = Number.isFinite(row.latestForks) ? `Forks ${{formatNumber(row.latestForks)}}` : 'Forks 暂无';
       return `
         <span class="metric hot">Stars ${{formatNumber(row.latestStars)}}</span>
@@ -798,6 +890,9 @@ def render_html(payload):
     els.searchInput.addEventListener('input', event => {{ state.q = event.target.value; render(); }});
     document.querySelectorAll('.segment').forEach(button => {{
       button.addEventListener('click', () => {{ state.range = button.dataset.range; syncControls(); render(); }});
+    }});
+    document.querySelectorAll('.domain-tab').forEach(button => {{
+      button.addEventListener('click', () => {{ state.domain = button.dataset.domain; syncControls(); render(); }});
     }});
     els.copyShare.addEventListener('click', async () => {{
       updateHash();
