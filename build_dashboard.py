@@ -482,15 +482,14 @@ def render_html(payload):
       border-collapse: collapse;
       table-layout: fixed;
     }}
-    .leaderboard col:nth-child(1) {{ width: 38%; }}
-    .leaderboard col:nth-child(2) {{ width: 86px; }}
-    .leaderboard col:nth-child(3) {{ width: 58px; }}
-    .leaderboard col:nth-child(4) {{ width: 78px; }}
-    .leaderboard col:nth-child(5) {{ width: 82px; }}
-    .leaderboard col:nth-child(6) {{ width: 64px; }}
-    .leaderboard col:nth-child(7) {{ width: 126px; }}
+    .leaderboard col:nth-child(1) {{ width: 50%; }}
+    .leaderboard col:nth-child(2) {{ width: 84px; }}
+    .leaderboard col:nth-child(3) {{ width: 76px; }}
+    .leaderboard col:nth-child(4) {{ width: 72px; }}
+    .leaderboard col:nth-child(5) {{ width: 78px; }}
+    .leaderboard col:nth-child(6) {{ width: 104px; }}
     .leaderboard th, .leaderboard td {{
-      padding: 12px 12px;
+      padding: 12px 10px;
       border-bottom: 1px solid var(--line);
       text-align: left;
       vertical-align: top;
@@ -555,7 +554,7 @@ def render_html(payload):
       .domain-tab, .rank-tab {{ flex: 1; }}
       .leaderboard th:nth-child(4), .leaderboard td:nth-child(4),
       .leaderboard th:nth-child(5), .leaderboard td:nth-child(5),
-      .leaderboard th:nth-child(7), .leaderboard td:nth-child(7) {{ display: none; }}
+      .leaderboard th:nth-child(6), .leaderboard td:nth-child(6) {{ display: none; }}
       .repo-top {{ grid-template-columns: auto minmax(0, 1fr); }}
       .share-mini {{ display: none; }}
     }}
@@ -638,16 +637,14 @@ def render_html(payload):
                 <col>
                 <col>
                 <col>
-                <col>
               </colgroup>
               <thead>
                 <tr>
                   <th>仓库</th>
                   <th id="scoreHeader" title="热度分以历史累计 Stars 和今日热度为主权重">热度分</th>
-                  <th title="所选周期内进入 GitHub Trending 的次数；次数越多代表热度越持续">出现</th>
+                  <th title="上方为所选周期内进入 GitHub Trending 的次数；下方为平均语言排名">出现/均排</th>
                   <th>Stars</th>
                   <th>+Stars</th>
-                  <th>均排</th>
                   <th title="柱越高代表对应日期的语言排名越靠前">排名走势</th>
                 </tr>
               </thead>
@@ -1056,7 +1053,7 @@ def render_html(payload):
     function renderLeaderboard(entries, summarizedRows) {{
       const rows = rankRows(summarizedRows || summarize(entries)).slice(0, 40);
       if (!rows.length) {{
-        els.leaderboard.innerHTML = '<tr><td class="empty" colspan="7">没有匹配的仓库</td></tr>';
+        els.leaderboard.innerHTML = '<tr><td class="empty" colspan="6">没有匹配的仓库</td></tr>';
         return;
       }}
       els.leaderboard.innerHTML = rows.map(row => `
@@ -1066,10 +1063,9 @@ def render_html(payload):
             <div class="hint">${{escapeHtml(row.languages)}}</div>
           </td>
           <td>${{row.score.toFixed(1)}}</td>
-          <td>${{row.count}}</td>
+          <td>${{row.count}}<div class="hint">${{row.avgRank.toFixed(1)}}</div></td>
           <td>${{formatNumber(row.latestStars)}}</td>
           <td>${{row.growth ? '+' + formatNumber(row.growth) : '暂无'}}</td>
-          <td>${{row.avgRank.toFixed(1)}}</td>
           <td><div class="spark" title="${{escapeHtml(row.dates.join(', '))}}">${{sparkBars(row.ranks)}}</div></td>
         </tr>
       `).join('');
