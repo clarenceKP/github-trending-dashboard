@@ -15,6 +15,28 @@ You need install `pyquery` & `requests`
   $ python scraper.py
 ```
 
+## Dashboard
+
+Build a shareable static dashboard from the collected markdown files:
+
+```bash
+  $ python build_dashboard.py
+```
+
+Open `dashboard.html` in a browser to browse the daily, weekly, and monthly trending rankings. By default the dashboard includes the latest 370 days to keep the HTML easy to share. Use `python build_dashboard.py --all` if you need the full historical dataset.
+
+GitHub Pages entrypoint:
+
+```bash
+  $ python build_dashboard.py --output docs/index.html
+```
+
+Recommended share URL:
+
+```text
+https://clarenceKP.github.io/github-trending-dashboard/
+```
+
 ## Advance
 
 A better place to use the script is in VPS
