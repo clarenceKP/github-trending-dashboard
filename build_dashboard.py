@@ -239,6 +239,22 @@ def render_html(payload):
     .stat {{ padding: 16px; }}
     .stat .label {{ color: var(--muted); font-size: 13px; }}
     .stat .value {{ margin-top: 5px; font-size: 24px; font-weight: 800; letter-spacing: 0; overflow-wrap: anywhere; }}
+    .brief {{
+      margin-bottom: 18px;
+      padding: 18px;
+    }}
+    .brief h2 {{
+      margin: 0 0 8px;
+      font-size: 18px;
+      letter-spacing: 0;
+    }}
+    .brief p {{
+      margin: 0;
+      color: #344054;
+      line-height: 1.7;
+      font-size: 15px;
+    }}
+    .brief strong {{ color: var(--ink); }}
     .grid {{
       display: grid;
       grid-template-columns: minmax(0, 1.15fr) minmax(360px, .85fr);
@@ -333,6 +349,7 @@ def render_html(payload):
       vertical-align: middle;
     }}
     .badge.rising {{ background: var(--accent-3); }}
+    .badge.score {{ background: var(--accent-2); }}
     .pill {{
       display: inline-flex;
       align-items: center;
@@ -442,6 +459,7 @@ def render_html(payload):
     </section>
 
     <main>
+      <section class="panel brief" id="periodBrief"></section>
       <section class="stats" id="stats"></section>
       <section class="grid">
         <section class="panel">
@@ -457,8 +475,8 @@ def render_html(payload):
         <section class="panel">
           <div class="panel-head">
             <div>
-              <h2>周期热度榜</h2>
-              <div class="hint">按出现次数、平均排名和最新排名综合展示</div>
+              <h2>综合评分榜</h2>
+              <div class="hint">以 Stars 和增长为主权重，兼顾上榜频次与排名</div>
             </div>
           </div>
           <div style="overflow:auto; max-height: 820px;">
@@ -496,6 +514,7 @@ def render_html(payload):
       dateSelect: document.getElementById('dateSelect'),
       languageSelect: document.getElementById('languageSelect'),
       searchInput: document.getElementById('searchInput'),
+      periodBrief: document.getElementById('periodBrief'),
       stats: document.getElementById('stats'),
       repoList: document.getElementById('repoList'),
       leaderboard: document.getElementById('leaderboard'),
@@ -577,6 +596,8 @@ def render_html(payload):
       const totalStarsToday = entries.reduce((sum, entry) => sum + (entry.starsToday || 0), 0);
       const hottest = rows.filter(row => Number.isFinite(row.latestStars)).sort((a, b) => b.latestStars - a.latestStars)[0];
       const fastest = rows.filter(row => Number.isFinite(row.growth)).sort((a, b) => b.growth - a.growth)[0];
+      const recommended = rankRows(rows);
+      renderBrief(recommended, dates, entries);
       renderStats([
         ['数据日期', state.range === 'day' ? state.date : `${{dates[0]}} 至 ${{dates[dates.length - 1]}}`],
         ['仓库数量', repos.size.toLocaleString()],
@@ -585,8 +606,8 @@ def render_html(payload):
         ['最高 Stars', hottest ? formatNumber(hottest.latestStars) : '暂无'],
         ['最快增长', fastest ? `+${{formatNumber(fastest.growth)}}` : '暂无']
       ]);
-      renderPrimary(state.range === 'day' ? daily : entries);
-      renderLeaderboard(entries, rows);
+      renderPrimary(recommended);
+      renderLeaderboard(entries, recommended);
       const mdPath = state.date.startsWith('2025') || state.date.startsWith('2026') ? `${{state.date}}.md` : `${{state.date.slice(0, 4)}}/${{state.date}}.md`;
       els.openLatestMd.href = mdPath;
       els.footerNote.textContent = `数据生成时间：${{new Date(DATA.generatedAt).toLocaleString()}}。当前 HTML 内嵌最近 ${{DATA.includedDays}} 天 / 总计 ${{DATA.totalDays}} 天中的 ${{DATA.entries.length.toLocaleString()}} 条排名记录，可以作为单个 HTML 文件分享。`;
@@ -601,30 +622,48 @@ def render_html(payload):
       `).join('');
     }}
 
-    function renderPrimary(entries) {{
-      const title = state.range === 'day' ? '当天排名' : (state.range === 'week' ? '近一周明细' : '近一月明细');
+    function renderBrief(rows, dates, entries) {{
+      const top = rows[0];
+      const hottest = rows.filter(row => Number.isFinite(row.latestStars)).sort((a, b) => b.latestStars - a.latestStars)[0];
+      const fastest = rows.filter(row => Number.isFinite(row.growth)).sort((a, b) => b.growth - a.growth)[0];
+      const starEntries = entries.filter(entry => Number.isFinite(entry.stars));
+      const periodLabel = state.range === 'day' ? state.date : `${{dates[0]}} 至 ${{dates[dates.length - 1]}}`;
+      if (!rows.length) {{
+        els.periodBrief.innerHTML = '<h2>周期导读</h2><p>当前筛选条件下没有可展示的项目。</p>';
+        return;
+      }}
+      const coverage = starEntries.length ? `其中 ${{starEntries.length}} 条记录带有 star 快照，排序会优先参考项目体量和增长速度。` : '当前周期大多是历史旧记录，缺少 star 快照，排序会回退参考上榜频次和排名。';
+      const topText = `<strong>${{escapeHtml(top.title)}}</strong> 是综合推荐榜首，综合分 ${{top.score.toFixed(1)}}，最新 Stars ${{formatNumber(top.latestStars)}}，周期新增 ${{top.growth ? '+' + formatNumber(top.growth) : '暂无'}}。`;
+      const hotText = hottest ? `最热门项目是 <strong>${{escapeHtml(hottest.title)}}</strong>，总 Stars ${{formatNumber(hottest.latestStars)}}。` : '';
+      const fastText = fastest ? `增长最快的是 <strong>${{escapeHtml(fastest.title)}}</strong>，本周期新增 ${{fastest.growth ? '+' + formatNumber(fastest.growth) : '暂无'}}。` : '';
+      els.periodBrief.innerHTML = `<h2>周期导读</h2><p>${{periodLabel}}，${{state.language === 'all' ? '跨语言' : escapeHtml(state.language)}}共观察到 ${{rows.length}} 个独立项目。${{coverage}} ${{topText}} ${{hotText}} ${{fastText}}</p>`;
+    }}
+
+    function renderPrimary(rows) {{
+      const title = state.range === 'day' ? '综合推荐榜' : (state.range === 'week' ? '近一周综合推荐' : '近一月综合推荐');
       els.primaryTitle.textContent = title;
-      els.primaryHint.textContent = `${{state.language === 'all' ? '全部语言' : state.language}}，${{entries.length}} 条记录`;
-      const sorted = entries.slice().sort((a, b) => b.date.localeCompare(a.date) || a.language.localeCompare(b.language) || a.rank - b.rank).slice(0, 80);
+      els.primaryHint.textContent = `${{state.language === 'all' ? '跨语言整体视图' : state.language}}，按 Stars、增长、上榜稳定性和排名综合排序`;
+      const sorted = rows.slice(0, 80);
       if (!sorted.length) {{
         els.repoList.innerHTML = '<div class="empty">没有匹配的排名记录</div>';
         return;
       }}
-      els.repoList.innerHTML = sorted.map(entry => `
+      els.repoList.innerHTML = sorted.map((row, index) => `
         <article class="repo-card">
           <div class="repo-top">
-            <span class="rank">#${{entry.rank}}</span>
+            <span class="rank">#${{index + 1}}</span>
             <div>
-              <h3><a href="${{entry.url}}" target="_blank" rel="noreferrer">${{escapeHtml(entry.title)}}</a></h3>
-              <p class="desc">${{escapeHtml(entry.description || '暂无描述')}}</p>
-              <div class="metric-row">${{entryMetrics(entry)}}</div>
+              <h3><a href="${{row.url}}" target="_blank" rel="noreferrer">${{escapeHtml(row.title)}}</a>${{row.latestStars >= 50000 ? '<span class="badge">热门</span>' : ''}}${{row.growth >= 500 ? '<span class="badge rising">明星</span>' : ''}}<span class="badge score">Score ${{row.score.toFixed(1)}}</span></h3>
+              <p class="desc">${{escapeHtml(row.description || '暂无描述')}}</p>
+              <div class="metric-row">${{rowMetrics(row)}}</div>
             </div>
-            <button class="share-mini" title="复制该仓库链接" data-url="${{entry.url}}">↗</button>
+            <button class="share-mini" title="复制该仓库链接" data-url="${{row.url}}">↗</button>
           </div>
           <div class="meta">
-            <span class="pill">${{entry.date}}</span>
-            <span class="pill">${{escapeHtml(entry.language)}}</span>
-            <span class="pill">${{escapeHtml(entry.repo)}}</span>
+            <span class="pill">最新 ${{row.latestDate}}</span>
+            <span class="pill">${{escapeHtml(row.languages)}}</span>
+            <span class="pill">语言排名 #${{row.latestRank}}</span>
+            <span class="pill">${{escapeHtml(row.repo)}}</span>
           </div>
         </article>
       `).join('');
@@ -653,6 +692,7 @@ def render_html(payload):
           count: rows.length,
           avgRank,
           latestRank: latest.rank,
+          latestDate: latest.date,
           latestStars: latestStar ? latestStar.stars : null,
           latestForks: latestStar ? latestStar.forks : null,
           starsToday: sameDayGrowth,
@@ -661,15 +701,27 @@ def render_html(payload):
           dates: rows.map(row => row.date),
           ranks: rows.map(row => row.rank)
         }};
-      }}).sort((a, b) => b.count - a.count || a.avgRank - b.avgRank || a.latestRank - b.latestRank);
+      }}).map(row => {{
+        row.score = scoreRow(row);
+        return row;
+      }}).sort((a, b) => b.score - a.score || b.count - a.count || a.avgRank - b.avgRank || a.latestRank - b.latestRank);
+    }}
+
+    function scoreRow(row) {{
+      const starScore = Number.isFinite(row.latestStars) ? Math.log10(row.latestStars + 1) * 28 : 0;
+      const growthScore = Number.isFinite(row.growth) ? Math.log10(row.growth + 1) * 34 : 0;
+      const todayScore = Number.isFinite(row.starsToday) ? Math.log10(row.starsToday + 1) * 18 : 0;
+      const rankScore = Math.max(0, 22 - row.avgRank);
+      const stabilityScore = Math.min(row.count, 10) * 3;
+      return starScore + growthScore + todayScore + rankScore + stabilityScore;
+    }}
+
+    function rankRows(rows) {{
+      return rows.slice().sort((a, b) => b.score - a.score || (b.latestStars || 0) - (a.latestStars || 0) || (b.growth || 0) - (a.growth || 0) || a.avgRank - b.avgRank);
     }}
 
     function renderLeaderboard(entries, summarizedRows) {{
-      const rows = (summarizedRows || summarize(entries)).slice().sort((a, b) => {{
-        const growthDiff = (b.growth || 0) - (a.growth || 0);
-        const starDiff = (b.latestStars || 0) - (a.latestStars || 0);
-        return b.count - a.count || growthDiff || starDiff || a.avgRank - b.avgRank || a.latestRank - b.latestRank;
-      }}).slice(0, 40);
+      const rows = rankRows(summarizedRows || summarize(entries)).slice(0, 40);
       if (!rows.length) {{
         els.leaderboard.innerHTML = '<tr><td class="empty" colspan="6">没有匹配的仓库</td></tr>';
         return;
@@ -698,6 +750,21 @@ def render_html(payload):
       return `
         <span class="metric hot">Stars ${{formatNumber(entry.stars)}}</span>
         <span class="metric rising">${{starsToday}}</span>
+        <span class="metric">${{forks}}</span>
+      `;
+    }}
+
+    function rowMetrics(row) {{
+      if (!Number.isFinite(row.latestStars)) {{
+        return '<span class="metric">暂无 star 快照</span>';
+      }}
+      const growth = row.growth ? `+${{formatNumber(row.growth)}} period` : 'period 暂无';
+      const today = row.starsToday ? `+${{formatNumber(row.starsToday)}} today` : 'today 暂无';
+      const forks = Number.isFinite(row.latestForks) ? `Forks ${{formatNumber(row.latestForks)}}` : 'Forks 暂无';
+      return `
+        <span class="metric hot">Stars ${{formatNumber(row.latestStars)}}</span>
+        <span class="metric rising">${{growth}}</span>
+        <span class="metric rising">${{today}}</span>
         <span class="metric">${{forks}}</span>
       `;
     }}

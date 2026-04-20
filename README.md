@@ -23,7 +23,7 @@ Build a shareable static dashboard from the collected markdown files:
   $ python build_dashboard.py
 ```
 
-Open `dashboard.html` in a browser to browse the daily, weekly, and monthly trending rankings. New snapshots include total stars, forks, and stars gained today, so the dashboard can highlight hot repositories and fast-rising repositories. By default the dashboard includes the latest 370 days to keep the HTML easy to share. Use `python build_dashboard.py --all` if you need the full historical dataset.
+Open `dashboard.html` in a browser to browse the daily, weekly, and monthly trending rankings. New snapshots include total stars, forks, and stars gained today, so the dashboard can highlight hot repositories and fast-rising repositories. The main view deduplicates repositories across languages and ranks them by a weighted score that prioritizes stars and star growth while still considering rank and repeat appearances. By default the dashboard includes the latest 370 days to keep the HTML easy to share. Use `python build_dashboard.py --all` if you need the full historical dataset.
 
 GitHub Pages entrypoint:
 
