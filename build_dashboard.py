@@ -127,17 +127,17 @@ def render_html(payload):
   <style>
     :root {{
       color-scheme: light;
-      --ink: #172033;
+      --ink: #101828;
       --muted: #667085;
-      --line: rgba(132, 152, 179, .32);
-      --panel: rgba(255, 255, 255, .74);
-      --panel-strong: rgba(255, 255, 255, .88);
-      --soft: rgba(246, 248, 251, .86);
-      --accent: #087568;
+      --line: rgba(130, 150, 175, .30);
+      --panel: rgba(255, 255, 255, .70);
+      --panel-strong: rgba(255, 255, 255, .90);
+      --soft: rgba(247, 249, 252, .82);
+      --accent: #006b5f;
       --accent-2: #b42318;
-      --accent-3: #6e56cf;
+      --accent-3: #635bff;
       --good: #067647;
-      --shadow: 0 22px 60px rgba(32, 48, 74, 0.12);
+      --shadow: 0 18px 58px rgba(16, 24, 40, 0.10), inset 0 1px 0 rgba(255,255,255,.62);
       --glass: saturate(180%) blur(24px);
     }}
     * {{ box-sizing: border-box; }}
@@ -146,20 +146,22 @@ def render_html(payload):
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       color: var(--ink);
       background:
-        linear-gradient(180deg, rgba(246, 249, 252, .98), rgba(231, 238, 247, .94)),
-        linear-gradient(120deg, rgba(219, 244, 239, .52), rgba(239, 243, 255, .68));
+        linear-gradient(180deg, rgba(249, 251, 253, .98), rgba(232, 239, 248, .96)),
+        linear-gradient(120deg, rgba(220, 244, 239, .50), rgba(239, 243, 255, .64));
+      background-attachment: fixed;
     }}
     button, input, select {{ font: inherit; }}
     a {{ color: inherit; }}
     .app-shell {{ min-height: 100vh; }}
     .hero {{
-      padding: 30px 28px 22px;
+      padding: 34px 28px 24px;
       color: #fff;
       background:
-        linear-gradient(115deg, rgba(10, 37, 48, .92), rgba(12, 92, 78, .78)),
+        linear-gradient(115deg, rgba(7, 28, 39, .94), rgba(13, 91, 81, .76)),
         url("https://images.unsplash.com/photo-1556075798-4825dfaaf498?auto=format&fit=crop&w=1800&q=80");
       background-size: cover;
       background-position: center;
+      box-shadow: inset 0 -1px 0 rgba(255,255,255,.18);
     }}
     .hero-inner {{
       width: min(1440px, 100%);
@@ -187,10 +189,11 @@ def render_html(payload):
       border-radius: 8px;
       padding: 8px 13px;
       color: #fff;
-      background: rgba(255,255,255,.16);
+      background: rgba(255,255,255,.18);
       backdrop-filter: var(--glass);
       cursor: pointer;
       text-decoration: none;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.22);
     }}
     .button.dark {{
       color: var(--ink);
@@ -219,14 +222,46 @@ def render_html(payload):
       min-height: 40px;
       border: 1px solid var(--line);
       border-radius: 8px;
-      background: rgba(255,255,255,.76);
+      background: linear-gradient(180deg, rgba(255,255,255,.88), rgba(255,255,255,.68));
       color: var(--ink);
       padding: 8px 10px;
       outline: none;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.72), 0 8px 24px rgba(32,48,74,.05);
     }}
     .control:focus {{
       border-color: rgba(8,117,104,.55);
       box-shadow: 0 0 0 4px rgba(8,117,104,.10);
+    }}
+    .search-box {{
+      position: relative;
+      display: flex;
+      align-items: center;
+      min-height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: linear-gradient(180deg, rgba(255,255,255,.90), rgba(255,255,255,.70));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.72), 0 8px 24px rgba(32,48,74,.05);
+    }}
+    .search-box svg {{
+      position: absolute;
+      left: 12px;
+      width: 17px;
+      height: 17px;
+      color: #667085;
+      pointer-events: none;
+    }}
+    .search-box input {{
+      width: 100%;
+      min-height: 40px;
+      border: 0;
+      outline: none;
+      background: transparent;
+      padding: 8px 10px 8px 38px;
+      color: var(--ink);
+    }}
+    .search-box:focus-within {{
+      border-color: rgba(8,117,104,.55);
+      box-shadow: 0 0 0 4px rgba(8,117,104,.10), inset 0 1px 0 rgba(255,255,255,.78);
     }}
     .segments {{
       display: grid;
@@ -235,7 +270,8 @@ def render_html(payload):
       padding: 4px;
       border: 1px solid var(--line);
       border-radius: 8px;
-      background: rgba(255,255,255,.68);
+      background: linear-gradient(180deg, rgba(255,255,255,.88), rgba(255,255,255,.66));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.72), 0 8px 24px rgba(32,48,74,.05);
     }}
     .segment {{
       border: 0;
@@ -259,25 +295,31 @@ def render_html(payload):
     .stat, .panel, .repo-card {{
       border: 1px solid var(--line);
       border-radius: 8px;
-      background: var(--panel);
+      background: linear-gradient(180deg, rgba(255,255,255,.80), rgba(255,255,255,.58));
       box-shadow: var(--shadow);
       backdrop-filter: var(--glass);
     }}
-    .domain-tabs {{
+    .tab-rail {{
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
       margin-bottom: 16px;
+      align-items: center;
+    }}
+    .domain-tabs, .rank-tabs {{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
       padding: 6px;
       width: max-content;
       max-width: 100%;
       border: 1px solid var(--line);
       border-radius: 8px;
-      background: rgba(255,255,255,.58);
+      background: linear-gradient(180deg, rgba(255,255,255,.76), rgba(255,255,255,.52));
       backdrop-filter: var(--glass);
       box-shadow: 0 16px 42px rgba(32,48,74,.08);
     }}
-    .domain-tab {{
+    .domain-tab, .rank-tab {{
       min-height: 34px;
       border: 0;
       border-radius: 7px;
@@ -286,9 +328,9 @@ def render_html(payload):
       background: transparent;
       cursor: pointer;
     }}
-    .domain-tab.active {{
+    .domain-tab.active, .rank-tab.active {{
       color: #fff;
-      background: #172033;
+      background: linear-gradient(180deg, #172033, #263348);
       box-shadow: 0 10px 24px rgba(23,32,51,.18);
     }}
     .stat {{ padding: 16px; }}
@@ -328,7 +370,17 @@ def render_html(payload):
     .panel h2 {{ margin: 0; font-size: 17px; letter-spacing: 0; }}
     .hint {{ color: var(--muted); font-size: 13px; }}
     .repo-list {{ display: grid; gap: 10px; padding: 14px; }}
-    .repo-card {{ box-shadow: none; padding: 14px; background: rgba(255,255,255,.74); }}
+    .repo-card {{
+      box-shadow: none;
+      padding: 14px;
+      background: linear-gradient(180deg, rgba(255,255,255,.82), rgba(255,255,255,.62));
+      transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+    }}
+    .repo-card:hover {{
+      transform: translateY(-1px);
+      border-color: rgba(99,91,255,.25);
+      box-shadow: 0 18px 40px rgba(32,48,74,.10);
+    }}
     .repo-top {{
       display: grid;
       grid-template-columns: auto minmax(0, 1fr) auto;
@@ -398,15 +450,15 @@ def render_html(payload):
       padding: 2px 7px;
       margin-left: 6px;
       color: #fff;
-      background: var(--accent);
+      background: linear-gradient(180deg, var(--accent), #00554d);
       font-size: 11px;
       font-weight: 800;
       vertical-align: middle;
     }}
-    .badge.rising {{ background: var(--accent-3); }}
-    .badge.score {{ background: var(--accent-2); }}
-    .badge.ai {{ background: #175cd3; }}
-    .badge.finance {{ background: #027a48; }}
+    .badge.rising {{ background: linear-gradient(180deg, var(--accent-3), #4e43d8); }}
+    .badge.score {{ background: linear-gradient(180deg, var(--accent-2), #8f1d16); }}
+    .badge.ai {{ background: linear-gradient(180deg, #175cd3, #0b49a0); }}
+    .badge.finance {{ background: linear-gradient(180deg, #027a48, #05603a); }}
     .pill {{
       display: inline-flex;
       align-items: center;
@@ -483,8 +535,9 @@ def render_html(payload):
       h1 {{ font-size: 34px; line-height: 1; }}
       .toolbar-inner, main {{ width: calc(100% - 20px); }}
       .toolbar-inner, .stats {{ grid-template-columns: 1fr; }}
-      .domain-tabs {{ width: 100%; }}
-      .domain-tab {{ flex: 1; }}
+      .tab-rail {{ display: grid; grid-template-columns: 1fr; }}
+      .domain-tabs, .rank-tabs {{ width: 100%; }}
+      .domain-tab, .rank-tab {{ flex: 1; }}
       .leaderboard th:nth-child(4), .leaderboard td:nth-child(4),
       .leaderboard th:nth-child(5), .leaderboard td:nth-child(5),
       .leaderboard th:nth-child(7), .leaderboard td:nth-child(7) {{ display: none; }}
@@ -520,16 +573,27 @@ def render_html(payload):
           <button class="segment" data-range="week">近一周</button>
           <button class="segment" data-range="month">近一月</button>
         </div>
-        <input class="control" id="searchInput" type="search" placeholder="模糊搜索：repo、作者、关键词">
+        <label class="search-box" aria-label="模糊搜索">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M10.75 18.25a7.5 7.5 0 1 1 5.3-2.2l3.2 3.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <input id="searchInput" type="search" placeholder="模糊搜索：repo、作者、关键词">
+        </label>
       </div>
     </section>
 
     <main>
-      <nav class="domain-tabs" id="domainTabs" aria-label="重点领域">
-        <button class="domain-tab active" data-domain="all">整体视图</button>
-        <button class="domain-tab" data-domain="ai">AI 项目</button>
-        <button class="domain-tab" data-domain="finance">金融项目</button>
-      </nav>
+      <div class="tab-rail">
+        <nav class="rank-tabs" id="rankTabs" aria-label="榜单类型">
+          <button class="rank-tab active" data-rank-mode="hot">🔥 热门榜</button>
+          <button class="rank-tab" data-rank-mode="rising">🚀 飙升榜</button>
+        </nav>
+        <nav class="domain-tabs" id="domainTabs" aria-label="重点领域">
+          <button class="domain-tab active" data-domain="all">整体视图</button>
+          <button class="domain-tab" data-domain="ai">AI 项目</button>
+          <button class="domain-tab" data-domain="finance">金融项目</button>
+        </nav>
+      </div>
       <section class="panel brief" id="periodBrief"></section>
       <section class="stats" id="stats"></section>
       <section class="grid">
@@ -546,8 +610,8 @@ def render_html(payload):
         <section class="panel">
           <div class="panel-head">
             <div>
-              <h2>综合评分榜</h2>
-              <div class="hint">以 Stars 和增长为主权重，兼顾上榜频次与排名</div>
+              <h2 id="leaderboardTitle">热门榜</h2>
+              <div class="hint" id="leaderboardHint">以累计 Stars 和热度为主权重</div>
             </div>
           </div>
           <div style="overflow:auto; max-height: 820px;">
@@ -555,7 +619,7 @@ def render_html(payload):
               <thead>
                 <tr>
                   <th>仓库</th>
-                  <th title="推荐分由 Stars、增长、上榜次数和排名加权得到">推荐分</th>
+                  <th id="scoreHeader" title="热度分以历史累计 Stars 和今日热度为主权重">热度分</th>
                   <th>出现</th>
                   <th>Stars</th>
                   <th>+Stars</th>
@@ -579,6 +643,7 @@ def render_html(payload):
       date: DATA.latestDate,
       language: 'all',
       domain: 'all',
+      rankMode: 'hot',
       range: 'day',
       q: ''
     }};
@@ -587,11 +652,15 @@ def render_html(payload):
       dateSelect: document.getElementById('dateSelect'),
       languageSelect: document.getElementById('languageSelect'),
       searchInput: document.getElementById('searchInput'),
+      rankTabs: document.getElementById('rankTabs'),
       domainTabs: document.getElementById('domainTabs'),
       periodBrief: document.getElementById('periodBrief'),
       stats: document.getElementById('stats'),
       repoList: document.getElementById('repoList'),
       leaderboard: document.getElementById('leaderboard'),
+      leaderboardTitle: document.getElementById('leaderboardTitle'),
+      leaderboardHint: document.getElementById('leaderboardHint'),
+      scoreHeader: document.getElementById('scoreHeader'),
       primaryTitle: document.getElementById('primaryTitle'),
       primaryHint: document.getElementById('primaryHint'),
       footerNote: document.getElementById('footerNote'),
@@ -617,11 +686,13 @@ def render_html(payload):
       const date = params.get('date');
       const language = params.get('language');
       const domain = params.get('domain');
+      const rankMode = params.get('rankMode');
       const range = params.get('range');
       const q = params.get('q');
       if (date && DATA.dates.includes(date)) state.date = date;
       if (language && (language === 'all' || DATA.languages.includes(language))) state.language = language;
       if (['all', 'ai', 'finance'].includes(domain)) state.domain = domain;
+      if (['hot', 'rising'].includes(rankMode)) state.rankMode = rankMode;
       if (['day', 'week', 'month'].includes(range)) state.range = range;
       if (q) state.q = q;
     }}
@@ -631,6 +702,7 @@ def render_html(payload):
       els.languageSelect.value = state.language;
       els.searchInput.value = state.q;
       document.querySelectorAll('.segment').forEach(button => button.classList.toggle('active', button.dataset.range === state.range));
+      document.querySelectorAll('.rank-tab').forEach(button => button.classList.toggle('active', button.dataset.rankMode === state.rankMode));
       document.querySelectorAll('.domain-tab').forEach(button => button.classList.toggle('active', button.dataset.domain === state.domain));
     }}
 
@@ -639,6 +711,7 @@ def render_html(payload):
       params.set('date', state.date);
       params.set('language', state.language);
       params.set('domain', state.domain);
+      params.set('rankMode', state.rankMode);
       params.set('range', state.range);
       if (state.q) params.set('q', state.q);
       history.replaceState(null, '', '#' + params.toString());
@@ -687,6 +760,20 @@ def render_html(payload):
 
     function domainLabel(domain) {{
       return domain === 'ai' ? 'AI' : domain === 'finance' ? '金融' : '整体';
+    }}
+
+    function rankModeLabel(mode = state.rankMode) {{
+      return mode === 'rising' ? '飙升榜' : '热门榜';
+    }}
+
+    function scoreLabel(mode = state.rankMode) {{
+      return mode === 'rising' ? '飙升分' : '热度分';
+    }}
+
+    function scoreTooltip(mode = state.rankMode) {{
+      return mode === 'rising'
+        ? '飙升分以观测周期新增 Stars 和今日新增 Stars 为主权重，兼顾排名质量'
+        : '热度分以历史累计 Stars 和今日热度为主权重，兼顾周期增长、上榜次数和排名';
     }}
 
     function domainBadges(domains) {{
@@ -761,7 +848,7 @@ def render_html(payload):
       return rows
         .map(row => ({{ ...row, searchScore: fuzzyScore(q, rowSearchText(row)) }}))
         .filter(row => row.searchScore >= 0)
-        .sort((a, b) => b.searchScore - a.searchScore || b.score - a.score);
+        .sort((a, b) => b.searchScore - a.searchScore || activeScore(b) - activeScore(a));
     }}
 
     function render() {{
@@ -779,6 +866,12 @@ def render_html(payload):
       const fastest = rows.filter(row => Number.isFinite(row.growth)).sort((a, b) => b.growth - a.growth)[0];
       const recommended = rankRows(rows);
       renderBrief(recommended, dates);
+      els.leaderboardTitle.textContent = rankModeLabel();
+      els.leaderboardHint.textContent = state.rankMode === 'rising'
+        ? '以周期新增 Stars、今日新增和增长速度为主权重'
+        : '以历史累计 Stars、今日热度和长期口碑为主权重';
+      els.scoreHeader.textContent = scoreLabel();
+      els.scoreHeader.title = scoreTooltip();
       renderStats([
         ['数据日期', state.range === 'day' ? state.date : `${{dates[0]}} 至 ${{dates[dates.length - 1]}}`],
         ['仓库数量', repos.size.toLocaleString()],
@@ -813,18 +906,20 @@ def render_html(payload):
         els.periodBrief.innerHTML = '<h2>周期导读</h2><p>当前筛选条件下没有可展示的项目。</p>';
         return;
       }}
-      const coverage = starEntries.length ? `其中 ${{starEntries.length}} 条记录带有 star 快照，排序会优先参考项目体量和增长速度。` : '当前周期大多是历史旧记录，缺少 star 快照，排序会回退参考上榜频次和排名。';
-      const topText = `<strong>${{escapeHtml(top.title)}}</strong> 是综合推荐榜首，推荐分 ${{top.score.toFixed(1)}}，最新 Stars ${{formatNumber(top.latestStars)}}，周期新增 ${{top.growth ? '+' + formatNumber(top.growth) : '暂无'}}。`;
-      const hotText = hottest ? `最热门项目是 <strong>${{escapeHtml(hottest.title)}}</strong>，总 Stars ${{formatNumber(hottest.latestStars)}}。` : '';
-      const fastText = fastest ? `飙升最快的是 <strong>${{escapeHtml(fastest.title)}}</strong>，本周期新增 ${{fastest.growth ? '+' + formatNumber(fastest.growth) : '暂无'}}。` : '';
+      const coverage = starEntries.length ? `其中 ${{starEntries.length}} 个项目带有 star 快照或当前指标。` : '当前周期大多是历史旧记录，缺少 star 快照，排序会回退参考上榜频次和排名。';
+      const leadVerb = state.rankMode === 'rising' ? '飙升榜首' : '热门榜首';
+      const topText = `<strong>${{escapeHtml(top.title)}}</strong> 是${{leadVerb}}，${{scoreLabel()}} ${{top.score.toFixed(1)}}，最新 Stars ${{formatNumber(top.latestStars)}}，周期新增 ${{top.growth ? '+' + formatNumber(top.growth) : '暂无'}}。`;
+      const hotText = hottest ? `🔥 高星热门项目是 <strong>${{escapeHtml(hottest.title)}}</strong>，总 Stars ${{formatNumber(hottest.latestStars)}}。` : '';
+      const fastText = fastest ? `🚀 飙升最快的是 <strong>${{escapeHtml(fastest.title)}}</strong>，本周期新增 ${{fastest.growth ? '+' + formatNumber(fastest.growth) : '暂无'}}。` : '';
       const scopeLabel = state.domain === 'all' ? (state.language === 'all' ? '跨语言' : escapeHtml(state.language)) : domainLabel(state.domain);
       els.periodBrief.innerHTML = `<h2>周期导读</h2><p>${{periodLabel}}，${{scopeLabel}}共观察到 ${{rows.length}} 个独立项目。${{coverage}} ${{topText}} ${{hotText}} ${{fastText}}</p>`;
     }}
 
     function renderPrimary(rows) {{
-      const title = state.range === 'day' ? '综合推荐榜' : (state.range === 'week' ? '近一周综合推荐' : '近一月综合推荐');
+      const title = state.range === 'day' ? rankModeLabel() : (state.range === 'week' ? `近一周${{rankModeLabel()}}` : `近一月${{rankModeLabel()}}`);
       els.primaryTitle.textContent = title;
-      els.primaryHint.textContent = `${{state.domain === 'all' ? (state.language === 'all' ? '跨语言整体视图' : state.language) : domainLabel(state.domain)}}，按 Stars、增长、上榜稳定性和排名综合排序${{state.q.trim() ? '，已启用模糊搜索' : ''}}`;
+      const modeHint = state.rankMode === 'rising' ? '以周期新增 Stars 为主，观察爆发速度' : '以历史累计 Stars 和热度为主，观察长期口碑';
+      els.primaryHint.textContent = `${{state.domain === 'all' ? (state.language === 'all' ? '跨语言整体视图' : state.language) : domainLabel(state.domain)}}，${{modeHint}}${{state.q.trim() ? '，已启用模糊搜索' : ''}}`;
       const sorted = rows.slice(0, 80);
       if (!sorted.length) {{
         els.repoList.innerHTML = '<div class="empty">没有匹配的排名记录</div>';
@@ -835,7 +930,7 @@ def render_html(payload):
           <div class="repo-top">
             <span class="rank">#${{index + 1}}</span>
             <div>
-              <h3><a href="${{row.url}}" target="_blank" rel="noreferrer">${{escapeHtml(row.title)}}</a>${{row.latestStars >= 50000 ? '<span class="badge">高星口碑</span>' : ''}}${{row.growth >= 500 ? '<span class="badge rising">飙升项目</span>' : ''}}${{row.hasCurrentMetrics ? '<span class="badge score">当前指标</span>' : ''}}${{domainBadges(row.domains)}}<span class="badge score" title="推荐分由 Stars、增长、上榜次数和排名加权得到">推荐分 ${{row.score.toFixed(1)}}</span></h3>
+              <h3><a href="${{row.url}}" target="_blank" rel="noreferrer">${{escapeHtml(row.title)}}</a>${{row.latestStars >= 50000 ? '<span class="badge">🔥 高星热门</span>' : ''}}${{row.growth >= 500 ? '<span class="badge rising">🚀 飙升项目</span>' : ''}}${{row.hasCurrentMetrics ? '<span class="badge score">当前指标</span>' : ''}}${{domainBadges(row.domains)}}<span class="badge score" title="${{scoreTooltip()}}">${{scoreLabel()}} ${{row.score.toFixed(1)}}</span></h3>
               <p class="desc">${{escapeHtml(row.description || '暂无描述')}}</p>
               <div class="metric-row">${{rowMetrics(row)}}</div>
             </div>
@@ -887,22 +982,47 @@ def render_html(payload):
           ranks: rows.map(row => row.rank)
         }};
       }}).map(row => {{
-        row.score = scoreRow(row);
+        row.hotScore = hotScoreRow(row);
+        row.risingScore = risingScoreRow(row);
+        row.score = activeScore(row);
         return row;
       }}).sort((a, b) => b.score - a.score || b.count - a.count || a.avgRank - b.avgRank || a.latestRank - b.latestRank);
     }}
 
-    function scoreRow(row) {{
-      const starScore = Number.isFinite(row.latestStars) ? Math.log10(row.latestStars + 1) * 28 : 0;
-      const growthScore = Number.isFinite(row.growth) ? Math.log10(row.growth + 1) * 34 : 0;
-      const todayScore = Number.isFinite(row.starsToday) ? Math.log10(row.starsToday + 1) * 18 : 0;
+    function hotScoreRow(row) {{
+      const starScore = Number.isFinite(row.latestStars) ? Math.log10(row.latestStars + 1) * 44 : 0;
+      const todayScore = Number.isFinite(row.starsToday) ? Math.log10(row.starsToday + 1) * 20 : 0;
+      const growthScore = Number.isFinite(row.growth) ? Math.log10(row.growth + 1) * 12 : 0;
       const rankScore = Math.max(0, 22 - row.avgRank);
       const stabilityScore = Math.min(row.count, 10) * 3;
       return starScore + growthScore + todayScore + rankScore + stabilityScore;
     }}
 
+    function risingScoreRow(row) {{
+      const growthScore = Number.isFinite(row.growth) ? Math.log10(row.growth + 1) * 54 : 0;
+      const todayScore = Number.isFinite(row.starsToday) ? Math.log10(row.starsToday + 1) * 30 : 0;
+      const velocityBase = Number.isFinite(row.latestStars) && row.latestStars > 0 ? row.growth / row.latestStars : 0;
+      const velocityScore = velocityBase > 0 ? Math.min(42, Math.log10(velocityBase * 1000 + 1) * 18) : 0;
+      const starFloorScore = Number.isFinite(row.latestStars) ? Math.log10(row.latestStars + 1) * 8 : 0;
+      const rankScore = Math.max(0, 18 - row.avgRank);
+      const stabilityScore = Math.min(row.count, 7) * 2;
+      return growthScore + todayScore + velocityScore + starFloorScore + rankScore + stabilityScore;
+    }}
+
+    function activeScore(row) {{
+      return state.rankMode === 'rising' ? row.risingScore : row.hotScore;
+    }}
+
     function rankRows(rows) {{
-      return rows.slice().sort((a, b) => b.score - a.score || (b.latestStars || 0) - (a.latestStars || 0) || (b.growth || 0) - (a.growth || 0) || a.avgRank - b.avgRank);
+      return rows.slice()
+        .map(row => ({{ ...row, score: activeScore(row) }}))
+        .sort((a, b) => {{
+          if (state.q.trim()) {{
+            const searchDiff = (b.searchScore || 0) - (a.searchScore || 0);
+            if (Math.abs(searchDiff) > 0.001) return searchDiff;
+          }}
+          return b.score - a.score || (b.latestStars || 0) - (a.latestStars || 0) || (b.growth || 0) - (a.growth || 0) || a.avgRank - b.avgRank;
+        }});
     }}
 
     function renderLeaderboard(entries, summarizedRows) {{
@@ -914,7 +1034,7 @@ def render_html(payload):
       els.leaderboard.innerHTML = rows.map(row => `
         <tr>
           <td>
-            <a href="${{row.url}}" target="_blank" rel="noreferrer">${{escapeHtml(row.title)}}</a>${{row.latestStars >= 50000 ? '<span class="badge">高星口碑</span>' : ''}}${{row.growth >= 500 ? '<span class="badge rising">飙升项目</span>' : ''}}${{row.hasCurrentMetrics ? '<span class="badge score">当前指标</span>' : ''}}${{domainBadges(row.domains)}}
+            <a href="${{row.url}}" target="_blank" rel="noreferrer">${{escapeHtml(row.title)}}</a>${{row.latestStars >= 50000 ? '<span class="badge">🔥 高星热门</span>' : ''}}${{row.growth >= 500 ? '<span class="badge rising">🚀 飙升项目</span>' : ''}}${{row.hasCurrentMetrics ? '<span class="badge score">当前指标</span>' : ''}}${{domainBadges(row.domains)}}
             <div class="hint">${{escapeHtml(row.languages)}}</div>
           </td>
           <td>${{row.score.toFixed(1)}}</td>
@@ -984,6 +1104,9 @@ def render_html(payload):
     els.searchInput.addEventListener('input', event => {{ state.q = event.target.value; render(); }});
     document.querySelectorAll('.segment').forEach(button => {{
       button.addEventListener('click', () => {{ state.range = button.dataset.range; syncControls(); render(); }});
+    }});
+    document.querySelectorAll('.rank-tab').forEach(button => {{
+      button.addEventListener('click', () => {{ state.rankMode = button.dataset.rankMode; syncControls(); render(); }});
     }});
     document.querySelectorAll('.domain-tab').forEach(button => {{
       button.addEventListener('click', () => {{ state.domain = button.dataset.domain; syncControls(); render(); }});
