@@ -521,6 +521,7 @@ def render_html(payload):
       position: fixed;
       inset: 0;
       z-index: 20;
+      display: none;
       background: rgba(18, 30, 48, .24);
       backdrop-filter: blur(10px);
     }}
@@ -531,7 +532,7 @@ def render_html(payload):
       bottom: 14px;
       z-index: 21;
       width: min(720px, calc(100vw - 28px));
-      display: grid;
+      display: none;
       grid-template-rows: auto minmax(0, 1fr);
       border: 1px solid rgba(130,150,175,.38);
       border-radius: 8px;
@@ -543,6 +544,9 @@ def render_html(payload):
       backdrop-filter: saturate(190%) blur(30px);
       overflow: hidden;
     }}
+    body.insight-opened .insight-backdrop {{ display: block; }}
+    body.insight-opened .insight-drawer {{ display: grid; }}
+    .insight-backdrop[hidden], .insight-drawer[hidden] {{ display: none !important; }}
     .insight-head {{
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
