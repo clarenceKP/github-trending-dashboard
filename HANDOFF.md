@@ -247,6 +247,41 @@ It supports:
 - languages
 - domain labels
 
+## Non-AI Repo Insight
+
+The dashboard now includes a static "项目速读" drawer inspired by repo deep-dive products, but without calling AI, a backend, or live GitHub APIs.
+
+Entry points:
+
+- left-side repository cards: `速读`
+- right-side aggregate leaderboard rows: `项目速读`
+- share URLs: the dashboard hash can include `repo=owner/name`
+
+The drawer is generated client-side from already embedded dashboard rows. It includes:
+
+- positioning summary
+- reasons to inspect
+- suitable audience
+- first-read path after opening GitHub
+- architecture and technical clues
+- risk and verification checklist
+- source chips showing the ranking data used
+
+Important implementation functions in `build_dashboard.py`:
+
+- `renderSelectedInsight`
+- `renderInsight`
+- `buildInsight`
+- `inferProjectKind`
+- `insightHighlights`
+- `insightAudiences`
+- `insightReadPath`
+- `insightArchitecture`
+- `insightRisks`
+- `insightSources`
+
+This is intentionally heuristic. It should phrase architecture content as clues, not conclusions, because this version does not read README files or source trees.
+
 ## Known Limitations
 
 1. Historical markdown before the star-metadata upgrade lacks total stars, forks, and stars gained today.
@@ -254,6 +289,7 @@ It supports:
 3. AI and finance tags are keyword-based. They can produce false positives or miss projects with vague descriptions.
 4. The dashboard is generated as one large static HTML file. This is simple and portable, but not ideal for very large full-history datasets.
 5. GitHub Trending itself is language-section based. Cross-language ranking is a dashboard-level heuristic, not an official GitHub signal.
+6. The non-AI repo insight drawer uses ranking metadata and keyword rules only. It does not inspect repository README, docs, dependencies, diagrams, or code.
 
 ## Suggested Next Improvements
 
@@ -264,6 +300,7 @@ It supports:
 5. Add a proper changelog/insights panel showing new entrants, dropouts, and biggest movers.
 6. Split generated data into a separate JSON asset if `docs/index.html` becomes too large.
 7. Add Playwright screenshot regression checks for dashboard layout.
+8. Add a second-stage repository detail pipeline that caches README/docs/package metadata for top N projects, then upgrades the insight drawer from heuristic clues to source-backed summaries.
 
 ## Release Snapshot
 
@@ -280,6 +317,7 @@ This version includes:
 - hot/rising ranking modes
 - AI/finance tabs
 - fuzzy search
+- non-AI `项目速读` drawer with shareable repo hash links
 - star/fork/stars-today metadata parsing
 - current metric overrides for important repositories
 - GitHub Markdown link fix

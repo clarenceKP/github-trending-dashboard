@@ -477,6 +477,201 @@ def render_html(payload):
       height: 34px;
       cursor: pointer;
     }}
+    .repo-actions {{
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: flex-end;
+    }}
+    .insight-open, .inline-action, .drawer-button {{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-height: 32px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: linear-gradient(180deg, rgba(255,255,255,.88), rgba(255,255,255,.62));
+      color: #172033;
+      padding: 6px 10px;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 750;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.74), 0 8px 20px rgba(32,48,74,.06);
+    }}
+    .insight-open:hover, .inline-action:hover, .drawer-button:hover {{
+      border-color: rgba(99,91,255,.32);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.84), 0 12px 28px rgba(32,48,74,.10);
+    }}
+    .inline-action {{
+      margin-top: 7px;
+      min-height: 26px;
+      padding: 4px 8px;
+      color: #475467;
+      background: rgba(255,255,255,.56);
+    }}
+    .drawer-button.primary {{
+      color: #fff;
+      border-color: rgba(18,52,59,.18);
+      background: linear-gradient(180deg, #12343b, #0b242a);
+    }}
+    body.insight-opened {{ overflow: hidden; }}
+    .insight-backdrop {{
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      background: rgba(18, 30, 48, .24);
+      backdrop-filter: blur(10px);
+    }}
+    .insight-drawer {{
+      position: fixed;
+      top: 14px;
+      right: 14px;
+      bottom: 14px;
+      z-index: 21;
+      width: min(720px, calc(100vw - 28px));
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      border: 1px solid rgba(130,150,175,.38);
+      border-radius: 8px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.90), rgba(244,248,252,.78)),
+        radial-gradient(circle at 15% 0%, rgba(220,244,239,.70), transparent 36%),
+        radial-gradient(circle at 90% 10%, rgba(230,232,255,.72), transparent 34%);
+      box-shadow: 0 28px 90px rgba(16,24,40,.24), inset 0 1px 0 rgba(255,255,255,.78);
+      backdrop-filter: saturate(190%) blur(30px);
+      overflow: hidden;
+    }}
+    .insight-head {{
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 16px;
+      padding: 20px 22px 16px;
+      border-bottom: 1px solid rgba(130,150,175,.28);
+      background: rgba(255,255,255,.38);
+    }}
+    .eyebrow {{
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 850;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }}
+    .insight-head h2 {{
+      margin: 5px 0 6px;
+      font-size: 24px;
+      line-height: 1.22;
+      overflow-wrap: anywhere;
+    }}
+    .insight-head p {{
+      margin: 0;
+      color: #475467;
+      line-height: 1.55;
+      font-size: 13px;
+    }}
+    .insight-close {{
+      width: 34px;
+      height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255,255,255,.68);
+      cursor: pointer;
+      font-size: 20px;
+      line-height: 1;
+    }}
+    .insight-body {{
+      overflow: auto;
+      padding-bottom: 20px;
+    }}
+    .insight-hero {{
+      padding: 20px 22px;
+      border-bottom: 1px solid rgba(130,150,175,.24);
+    }}
+    .insight-summary {{
+      margin: 12px 0 14px;
+      color: #344054;
+      line-height: 1.72;
+      font-size: 15px;
+    }}
+    .insight-actions {{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }}
+    .insight-kpis {{
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 16px;
+    }}
+    .insight-kpi {{
+      min-height: 64px;
+      border: 1px solid rgba(130,150,175,.26);
+      border-radius: 8px;
+      padding: 10px;
+      background: rgba(255,255,255,.58);
+    }}
+    .insight-kpi span {{
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      margin-bottom: 4px;
+    }}
+    .insight-kpi strong {{
+      display: block;
+      font-size: 18px;
+      line-height: 1.2;
+      overflow-wrap: anywhere;
+    }}
+    .insight-nav {{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 14px;
+    }}
+    .insight-nav span, .source-chip {{
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      border-radius: 8px;
+      padding: 3px 8px;
+      color: #475467;
+      background: rgba(255,255,255,.58);
+      border: 1px solid rgba(130,150,175,.24);
+      font-size: 12px;
+      font-weight: 650;
+    }}
+    .insight-section {{
+      padding: 18px 22px;
+      border-top: 1px solid rgba(130,150,175,.22);
+    }}
+    .insight-section h3 {{
+      margin: 0 0 8px;
+      font-size: 16px;
+      line-height: 1.35;
+    }}
+    .insight-section p {{
+      margin: 0;
+      color: #475467;
+      line-height: 1.7;
+      font-size: 14px;
+    }}
+    .insight-points {{
+      margin: 9px 0 0;
+      padding-left: 18px;
+      color: #344054;
+      line-height: 1.68;
+      font-size: 14px;
+    }}
+    .insight-points li + li {{ margin-top: 6px; }}
+    .source-row {{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 10px;
+    }}
     .leaderboard {{
       width: 100%;
       border-collapse: collapse;
@@ -556,7 +751,12 @@ def render_html(payload):
       .leaderboard th:nth-child(5), .leaderboard td:nth-child(5),
       .leaderboard th:nth-child(6), .leaderboard td:nth-child(6) {{ display: none; }}
       .repo-top {{ grid-template-columns: auto minmax(0, 1fr); }}
+      .repo-actions {{ grid-column: 2; flex-direction: row; align-items: flex-start; justify-content: flex-start; }}
       .share-mini {{ display: none; }}
+      .insight-drawer {{ inset: 8px; width: auto; }}
+      .insight-head {{ padding: 16px; }}
+      .insight-hero, .insight-section {{ padding: 16px; }}
+      .insight-kpis {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }}
     }}
     @media (min-width: 681px) and (max-width: 1000px) {{
       h1 {{ font-size: 44px; }}
@@ -657,6 +857,19 @@ def render_html(payload):
     </main>
   </div>
 
+  <div class="insight-backdrop" id="insightBackdrop" hidden></div>
+  <aside class="insight-drawer" id="insightDrawer" hidden aria-hidden="true" aria-labelledby="insightTitle">
+    <div class="insight-head">
+      <div>
+        <div class="eyebrow">Repo Insight</div>
+        <h2 id="insightTitle">项目速读</h2>
+        <p id="insightSubtitle">基于榜单数据生成的非 AI 速读。</p>
+      </div>
+      <button class="insight-close" id="insightClose" type="button" aria-label="关闭项目速读">×</button>
+    </div>
+    <div class="insight-body" id="insightBody"></div>
+  </aside>
+
   <script id="dashboard-data" type="application/json">{data}</script>
   <script>
     const DATA = JSON.parse(document.getElementById('dashboard-data').textContent);
@@ -666,7 +879,8 @@ def render_html(payload):
       domain: 'all',
       rankMode: 'hot',
       range: 'day',
-      q: ''
+      q: '',
+      repo: ''
     }};
 
     const els = {{
@@ -686,7 +900,13 @@ def render_html(payload):
       primaryHint: document.getElementById('primaryHint'),
       footerNote: document.getElementById('footerNote'),
       copyShare: document.getElementById('copyShare'),
-      openLatestMd: document.getElementById('openLatestMd')
+      openLatestMd: document.getElementById('openLatestMd'),
+      insightBackdrop: document.getElementById('insightBackdrop'),
+      insightDrawer: document.getElementById('insightDrawer'),
+      insightTitle: document.getElementById('insightTitle'),
+      insightSubtitle: document.getElementById('insightSubtitle'),
+      insightBody: document.getElementById('insightBody'),
+      insightClose: document.getElementById('insightClose')
     }};
 
     const byDate = new Map();
@@ -694,6 +914,7 @@ def render_html(payload):
       if (!byDate.has(entry.date)) byDate.set(entry.date, []);
       byDate.get(entry.date).push(entry);
     }}
+    let currentRows = [];
 
     function initControls() {{
       els.dateSelect.innerHTML = DATA.dates.slice().reverse().map(date => `<option value="${{date}}">${{date}}</option>`).join('');
@@ -710,12 +931,14 @@ def render_html(payload):
       const rankMode = params.get('rankMode');
       const range = params.get('range');
       const q = params.get('q');
+      const repo = params.get('repo');
       if (date && DATA.dates.includes(date)) state.date = date;
       if (language && (language === 'all' || DATA.languages.includes(language))) state.language = language;
       if (['all', 'ai', 'finance'].includes(domain)) state.domain = domain;
       if (['hot', 'rising'].includes(rankMode)) state.rankMode = rankMode;
       if (['day', 'week', 'month'].includes(range)) state.range = range;
       if (q) state.q = q;
+      if (repo) state.repo = repo;
     }}
 
     function syncControls() {{
@@ -735,6 +958,7 @@ def render_html(payload):
       params.set('rankMode', state.rankMode);
       params.set('range', state.range);
       if (state.q) params.set('q', state.q);
+      if (state.repo) params.set('repo', state.repo);
       history.replaceState(null, '', '#' + params.toString());
     }}
 
@@ -890,6 +1114,7 @@ def render_html(payload):
       const hottest = rows.filter(row => Number.isFinite(row.latestStars)).sort((a, b) => b.latestStars - a.latestStars)[0];
       const fastest = rows.filter(row => Number.isFinite(row.growth)).sort((a, b) => b.growth - a.growth)[0];
       const recommended = rankRows(rows);
+      currentRows = recommended;
       renderBrief(recommended, dates);
       els.leaderboardTitle.textContent = aggregateRankModeLabel();
       els.leaderboardHint.textContent = state.rankMode === 'rising'
@@ -907,6 +1132,7 @@ def render_html(payload):
       ]);
       renderPrimary(recommended);
       renderLeaderboard(entries, recommended);
+      renderSelectedInsight();
       const mdPath = state.date.startsWith('2025') || state.date.startsWith('2026') ? `${{state.date}}.md` : `${{state.date.slice(0, 4)}}/${{state.date}}.md`;
       els.openLatestMd.href = `https://github.com/clarenceKP/github-trending-dashboard/blob/main/${{mdPath}}`;
       els.footerNote.textContent = `数据生成时间：${{new Date(DATA.generatedAt).toLocaleString()}}。当前 HTML 内嵌最近 ${{DATA.includedDays}} 天 / 总计 ${{DATA.totalDays}} 天中的 ${{DATA.entries.length.toLocaleString()}} 条排名记录，可以作为单个 HTML 文件分享。`;
@@ -959,7 +1185,10 @@ def render_html(payload):
               <p class="desc">${{escapeHtml(row.description || '暂无描述')}}</p>
               <div class="metric-row">${{rowMetrics(row)}}</div>
             </div>
-            <button class="share-mini" title="复制该仓库链接" data-url="${{row.url}}">↗</button>
+            <div class="repo-actions">
+              <button class="insight-open" type="button" data-insight-repo="${{escapeHtml(row.repo)}}" title="打开项目速读">速读</button>
+              <button class="share-mini" type="button" title="复制该仓库链接" data-url="${{row.url}}">↗</button>
+            </div>
           </div>
           <div class="meta">
             <span class="pill">最新 ${{row.latestDate}}</span>
@@ -1061,6 +1290,7 @@ def render_html(payload):
           <td>
             <a href="${{row.url}}" target="_blank" rel="noreferrer">${{escapeHtml(row.title)}}</a>${{row.latestStars >= 50000 ? '<span class="badge">🔥 高星热门</span>' : ''}}${{row.growth >= 500 ? '<span class="badge rising">🚀 飙升项目</span>' : ''}}${{row.hasCurrentMetrics ? '<span class="badge score">当前指标</span>' : ''}}${{domainBadges(row.domains)}}
             <div class="hint">${{escapeHtml(row.languages)}}</div>
+            <button class="inline-action" type="button" data-insight-repo="${{escapeHtml(row.repo)}}">项目速读</button>
           </td>
           <td>${{row.score.toFixed(1)}}</td>
           <td>${{row.count}}<div class="hint">${{row.avgRank.toFixed(1)}}</div></td>
@@ -1069,6 +1299,231 @@ def render_html(payload):
           <td><div class="spark" title="${{escapeHtml(row.dates.join(', '))}}">${{sparkBars(row.ranks)}}</div></td>
         </tr>
       `).join('');
+    }}
+
+    function renderSelectedInsight() {{
+      if (!state.repo) {{
+        hideInsight();
+        return;
+      }}
+      const row = findInsightRow(state.repo);
+      if (!row) {{
+        state.repo = '';
+        hideInsight();
+        updateHash();
+        return;
+      }}
+      renderInsight(row);
+    }}
+
+    function hideInsight() {{
+      els.insightBackdrop.hidden = true;
+      els.insightDrawer.hidden = true;
+      els.insightDrawer.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('insight-opened');
+    }}
+
+    function closeInsight() {{
+      state.repo = '';
+      hideInsight();
+      updateHash();
+    }}
+
+    function findInsightRow(repo) {{
+      const current = currentRows.find(row => row.repo === repo);
+      if (current) return current;
+      const dates = new Set(selectedDates());
+      const periodEntries = DATA.entries.filter(entry => entry.repo === repo && dates.has(entry.date));
+      if (periodEntries.length) return rankRows(summarize(periodEntries))[0];
+      const allEntries = DATA.entries.filter(entry => entry.repo === repo);
+      return allEntries.length ? rankRows(summarize(allEntries))[0] : null;
+    }}
+
+    function renderInsight(row) {{
+      const insight = buildInsight(row);
+      const currentIndex = currentRows.findIndex(item => item.repo === row.repo);
+      const rankText = currentIndex >= 0 ? `当前视图 #${{currentIndex + 1}}` : '当前筛选外';
+      els.insightTitle.textContent = row.title;
+      els.insightSubtitle.textContent = `${{row.repo}} · ${{row.languages || '语言未知'}} · ${{rankText}}`;
+      els.insightBody.innerHTML = `
+        <section class="insight-hero">
+          <div>${{domainBadges(row.domains)}}<span class="badge score">${{scoreLabel()}} ${{row.score.toFixed(1)}}</span></div>
+          <p class="insight-summary">${{escapeHtml(insight.position)}}</p>
+          <div class="insight-actions">
+            <a class="drawer-button primary" href="${{row.url}}" target="_blank" rel="noreferrer">打开 GitHub</a>
+            <a class="drawer-button" href="${{row.url}}#readme" target="_blank" rel="noreferrer">看 README</a>
+            <a class="drawer-button" href="${{row.url}}/issues" target="_blank" rel="noreferrer">看 Issues</a>
+            <button class="drawer-button" type="button" data-copy-insight>复制速读链接</button>
+          </div>
+          <div class="insight-kpis">
+            <div class="insight-kpi"><span>Stars</span><strong>${{formatNumber(row.latestStars)}}</strong></div>
+            <div class="insight-kpi"><span>周期新增</span><strong>${{row.growth ? '+' + formatNumber(row.growth) : '暂无'}}</strong></div>
+            <div class="insight-kpi"><span>上榜次数</span><strong>${{row.count}}</strong></div>
+            <div class="insight-kpi"><span>平均排名</span><strong>${{row.avgRank.toFixed(1)}}</strong></div>
+          </div>
+          <div class="insight-nav">
+            <span>定位</span><span>值得看</span><span>适合谁</span><span>阅读路径</span><span>技术线索</span><span>风险验证</span>
+          </div>
+        </section>
+        <section class="insight-section">
+          <h3>为什么值得看</h3>
+          <ul class="insight-points">${{listHtml(insight.highlights)}}</ul>
+        </section>
+        <section class="insight-section">
+          <h3>适合谁先打开</h3>
+          <ul class="insight-points">${{listHtml(insight.audiences)}}</ul>
+        </section>
+        <section class="insight-section">
+          <h3>打开仓库后先看什么</h3>
+          <ul class="insight-points">${{listHtml(insight.readPath)}}</ul>
+        </section>
+        <section class="insight-section">
+          <h3>架构与技术线索</h3>
+          <p>下面是非 AI 规则根据榜单描述、语言和领域标签给出的阅读线索，并不等同于源码分析结论。</p>
+          <ul class="insight-points">${{listHtml(insight.architecture)}}</ul>
+        </section>
+        <section class="insight-section">
+          <h3>风险与待验证项</h3>
+          <ul class="insight-points">${{listHtml(insight.risks)}}</ul>
+        </section>
+        <section class="insight-section">
+          <h3>速读来源</h3>
+          <p>本版本不调用 AI，也不实时读取仓库源码；所有内容来自 dashboard 已嵌入的 Trending 快照和可解释规则。</p>
+          <div class="source-row">${{insight.sources.map(item => `<span class="source-chip">${{escapeHtml(item)}}</span>`).join('')}}</div>
+        </section>
+      `;
+      els.insightBackdrop.hidden = false;
+      els.insightDrawer.hidden = false;
+      els.insightDrawer.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('insight-opened');
+    }}
+
+    function buildInsight(row) {{
+      const field = row.domains && row.domains.length ? row.domains.map(domainLabel).join(' / ') : '通用开源';
+      const kind = inferProjectKind(row);
+      const description = row.description || '榜单记录里暂时没有提供明确描述';
+      return {{
+        position: `${{row.title}} 可以先被理解为一个偏 ${{field}} 方向的${{kind}}。榜单描述是“${{description}}”。在当前 ${{rankModeLabel()}} 视角下，它的 ${{scoreLabel()}} 为 ${{row.score.toFixed(1)}}，适合先验证 README 的定位、安装路径、示例入口和维护活跃度。`,
+        highlights: insightHighlights(row),
+        audiences: insightAudiences(row),
+        readPath: insightReadPath(row),
+        architecture: insightArchitecture(row),
+        risks: insightRisks(row),
+        sources: insightSources(row)
+      }};
+    }}
+
+    function inferProjectKind(row) {{
+      const text = insightText(row);
+      if (/agent|llm|gpt|rag|model|inference|chatbot|llama|openai/.test(text)) return 'AI / Agent 项目';
+      if (/finance|financial|trading|portfolio|market|quant|terminal|stock|investment|crypto/.test(text)) return '金融分析或交易工具';
+      if (/framework|library|sdk|toolkit|engine/.test(text)) return '开发框架或工具库';
+      if (/cli|command|terminal|shell/.test(text)) return '命令行或终端工具';
+      if (/desktop|native|qt|macos|windows/.test(text)) return '桌面应用';
+      if (/browser|extension|web app|frontend|dashboard/.test(text)) return 'Web 或浏览器应用';
+      return '开源项目';
+    }}
+
+    function insightHighlights(row) {{
+      const items = [];
+      if (Number.isFinite(row.latestStars)) items.push(`累计 Stars 为 ${{formatNumber(row.latestStars)}}，可以作为社区关注度和长期口碑的第一层信号。`);
+      if (row.growth) items.push(`所选周期新增 ${{formatNumber(row.growth)}} Stars，说明近期关注度有明显抬升。`);
+      if (row.starsToday) items.push(`最近一次快照显示今日新增 ${{formatNumber(row.starsToday)}} Stars，适合关注短期传播速度。`);
+      if (row.count > 1) items.push(`在所选周期内出现 ${{row.count}} 次，热度不是一次性闪现。`);
+      if (row.avgRank <= 5) items.push(`平均语言排名 ${{row.avgRank.toFixed(1)}}，在进入榜单的日期里位置较靠前。`);
+      if (row.domains && row.domains.length) items.push(`命中 ${{row.domains.map(domainLabel).join(' / ')}} 领域标签，符合你当前重点关注方向。`);
+      if (row.hasCurrentMetrics) items.push('包含当前指标补充，适合弥补历史 Markdown 缺少星数的问题。');
+      if (!items.length) items.push('当前可用信号较少，建议优先打开仓库 README 和 release 记录再判断。');
+      return items;
+    }}
+
+    function insightAudiences(row) {{
+      const items = [];
+      const text = insightText(row);
+      if ((row.domains || []).includes('ai')) items.push('关注 AI Agent、模型应用、RAG、推理框架或自动化工作流的开发者。');
+      if ((row.domains || []).includes('finance')) items.push('关注投研、量化、金融终端、市场数据或交易工具的用户。');
+      if (hasLanguage(row, 'python')) items.push('Python 开发者，尤其适合先看安装依赖、示例脚本和 notebook。');
+      if (hasLanguage(row, 'javascript') || hasLanguage(row, 'typescript')) items.push('前端或全栈开发者，适合先看 package scripts、demo 和部署方式。');
+      if (hasLanguage(row, 'go') || hasLanguage(row, 'rust')) items.push('偏工程基础设施、CLI、服务端工具链或高性能组件的技术读者。');
+      if (/desktop|macos|windows|qt/.test(text)) items.push('希望试用桌面应用或本地工具的用户。');
+      if (row.latestStars >= 50000) items.push('想优先筛选高口碑、低踩坑概率项目的读者。');
+      if (row.growth >= 500) items.push('想捕捉近期快速传播项目、寻找早期机会的读者。');
+      if (!items.length) items.push('希望快速判断新上榜仓库是否值得进一步阅读的技术读者。');
+      return unique(items).slice(0, 6);
+    }}
+
+    function insightReadPath(row) {{
+      const items = [
+        '先读 README 的一句话定位、截图或 demo，确认它解决的具体问题。',
+        '再看 Quick Start / Installation，判断能否在本地快速跑通。',
+        '查看 examples、docs 或 demo 目录，优先寻找最小可运行样例。',
+        '打开 releases、issues 和最近 commit，判断维护节奏与常见问题。'
+      ];
+      if (hasLanguage(row, 'python')) items.push('Python 项目重点检查 pyproject.toml、requirements.txt、uv.lock、examples/ 和 notebooks/。');
+      if (hasLanguage(row, 'javascript') || hasLanguage(row, 'typescript')) items.push('JS/TS 项目重点检查 package.json scripts、examples/、apps/、src/ 和部署说明。');
+      if (hasLanguage(row, 'go')) items.push('Go 项目重点检查 go.mod、cmd/、internal/、examples/ 和配置样例。');
+      if (hasLanguage(row, 'rust')) items.push('Rust 项目重点检查 Cargo.toml、crates/、examples/、benches/ 和 feature flags。');
+      if (hasLanguage(row, 'swift')) items.push('Swift 项目重点检查 Package.swift、App 入口、权限说明和 macOS/iOS 兼容性。');
+      return unique(items);
+    }}
+
+    function insightArchitecture(row) {{
+      const text = insightText(row);
+      const items = [];
+      if (/agent|workflow|automation/.test(text)) items.push('如果它是 Agent/自动化项目，优先寻找任务编排、工具调用、记忆/状态和模型 provider 的边界。');
+      if (/rag|embedding|vector/.test(text)) items.push('如果涉及 RAG 或向量检索，重点确认数据接入、索引构建、召回、重排和评估链路。');
+      if (/desktop|native|qt|macos|windows/.test(text)) items.push('如果是桌面应用，重点看 UI 层、本地服务层、数据存储和系统权限的分离方式。');
+      if (/server|api|backend|service/.test(text)) items.push('如果描述里出现服务端/API，重点看路由、鉴权、任务队列、存储和部署说明。');
+      if (/finance|trading|market|portfolio|quant/.test(text)) items.push('金融项目重点验证数据源、回测假设、交易执行边界、风控和免责声明。');
+      if (/cli|command|terminal/.test(text)) items.push('终端/CLI 项目重点看命令设计、配置文件、插件机制和错误恢复。');
+      if (!items.length) items.push('当前描述无法稳定推断架构类型，建议从 README 的目录说明和源码树开始确认。');
+      items.push('这部分是规则线索，不替代源码级架构分析；后续 AI 版可以读取 README/docs 后生成更细的模块图。');
+      return items;
+    }}
+
+    function insightRisks(row) {{
+      const items = [
+        'Trending 代表短期关注度，不等于生产成熟度；仍需检查 license、维护者、release 和 issue 质量。',
+        '安装前确认依赖、系统权限、环境变量和第三方 API key，避免把 demo 当成可直接生产使用的方案。'
+      ];
+      if (!Number.isFinite(row.latestStars)) items.push('当前缺少 Stars 快照，热门/飙升判断会更多依赖上榜频次和语言排名。');
+      if (row.hasCurrentMetrics) items.push('部分指标来自当前补充数据，和历史快照的时间点可能不完全一致。');
+      if (row.count <= 1) items.push('所选周期内只出现一次，持续热度还需要继续观察。');
+      if (row.growth >= 500) items.push('增长很快的项目也可能文档、生态和稳定性尚未跟上，需要重点看 issue 和 breaking changes。');
+      if ((row.domains || []).includes('finance')) items.push('金融相关项目尤其要验证数据授权、交易风险、回测偏差和合规边界。');
+      return unique(items);
+    }}
+
+    function insightSources(row) {{
+      const firstDate = row.dates[0];
+      const lastDate = row.dates[row.dates.length - 1];
+      const sources = [
+        `Trending 周期：${{firstDate === lastDate ? firstDate : firstDate + ' 至 ' + lastDate}}`,
+        `语言：${{row.languages || '未知'}}`,
+        `上榜次数：${{row.count}}`,
+        `平均排名：${{row.avgRank.toFixed(1)}}`
+      ];
+      if (Number.isFinite(row.latestStars)) sources.push(`Stars：${{formatNumber(row.latestStars)}}`);
+      if (row.growth) sources.push(`周期新增：+${{formatNumber(row.growth)}}`);
+      if (Number.isFinite(row.latestForks)) sources.push(`Forks：${{formatNumber(row.latestForks)}}`);
+      if (row.domains && row.domains.length) sources.push(`领域：${{row.domains.map(domainLabel).join(' / ')}}`);
+      return sources;
+    }}
+
+    function insightText(row) {{
+      return `${{row.title || ''}} ${{row.repo || ''}} ${{row.description || ''}} ${{row.languages || ''}}`.toLowerCase();
+    }}
+
+    function hasLanguage(row, language) {{
+      return String(row.languages || '').toLowerCase().includes(language);
+    }}
+
+    function unique(items) {{
+      return Array.from(new Set(items.filter(Boolean)));
+    }}
+
+    function listHtml(items) {{
+      return items.map(item => `<li>${{escapeHtml(item)}}</li>`).join('');
     }}
 
     function entryMetrics(entry) {{
@@ -1146,7 +1601,31 @@ def render_html(payload):
       }}
       setTimeout(() => els.copyShare.textContent = '复制分享链接', 1600);
     }});
+    els.insightClose.addEventListener('click', closeInsight);
+    els.insightBackdrop.addEventListener('click', closeInsight);
+    document.addEventListener('keydown', event => {{
+      if (event.key === 'Escape' && state.repo) closeInsight();
+    }});
     document.body.addEventListener('click', async event => {{
+      const insightButton = event.target.closest('[data-insight-repo]');
+      if (insightButton) {{
+        state.repo = insightButton.dataset.insightRepo;
+        render();
+        return;
+      }}
+      const copyInsight = event.target.closest('[data-copy-insight]');
+      if (copyInsight) {{
+        updateHash();
+        const url = location.href;
+        try {{
+          await navigator.clipboard.writeText(url);
+          copyInsight.textContent = '已复制速读链接';
+        }} catch (error) {{
+          prompt('复制这个项目速读链接分享', url);
+        }}
+        setTimeout(() => copyInsight.textContent = '复制速读链接', 1600);
+        return;
+      }}
       const button = event.target.closest('.share-mini');
       if (!button) return;
       try {{
